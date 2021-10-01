@@ -107,7 +107,7 @@ class MenuParser:
                         result[current_day]["dishes"].append(row) #Add the row to the list of dished for the day
                     else:
                         logger.debug(f"{row} is an expected phrase.")
-                        menu_metadata["footer"] += f"\n{row}"
+                        menu_footer += f"\n{row}"
             else:
                 logger.info("Nothing should be added to the previous row.")
         #Add the result to the menu metadata
