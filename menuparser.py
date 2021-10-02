@@ -20,7 +20,7 @@ special_features = {
     "Pancake Thursday": "pancake_thursday",
     "Burger Friday": "burger_friday",
 }
-
+week_days_id_list = list(day_names_to_json_keys.values())
 known_footer_phrases = [
     re.compile("(.*)Eaterykortet*(.*)"), #Alternativt regex: (((L|l)unch){0,} *[0-9]{0,} *kr *)(med *){0,}Eaterykortet(.*) (mindre kompakt)
     re.compile("(.*)ingår(.*)")
@@ -110,6 +110,15 @@ class MenuParser:
                         menu_footer += f"\n{row}"
             else:
                 logger.info("Nothing should be added to the previous row.")
+        #Sort result so that it starts with monday and ends with the last day that a menu item is available for.
+        logger.info("Sorting result...")
+        def sort_by_day(day):
+            '''Function for sorting a dict's keys based on days.
+            Returns a sorted list of the keys.'''
+            return week_days_id_list.index(day)
+        sorted_result_keys = list(result.keys()) #Sort available keys
+        sorted_result_keys.sort(key=sort_by_day)
+        result = {key: result[key] for key in sorted_result_keys}
         #Add the result to the menu metadata
         menu_metadata["days"] = result
         #Add footer to the menu metadata
