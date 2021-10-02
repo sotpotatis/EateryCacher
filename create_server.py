@@ -20,7 +20,7 @@ def create_app():
     logger.info("Registering blueprint...")
     from server import app as server_blueprint
     #Register server routes
-    app.register_blueprint(server_blueprint, "server")
+    app.register_blueprint(server_blueprint)
     logger.info("Blueprint registered. Returning app...")
     return app #Return the created app
 
