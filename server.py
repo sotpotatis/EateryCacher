@@ -42,6 +42,7 @@ def generate_api_response_for(menu_id, week_number, day_number=None):
     logger.info(f"Generating API response for menu id {menu_id}, week day {week_number}...")
     #Grab menu data
     menu_data = read_json_from_file(cached_data_filepath)
+    logger.debug(f"Menu data: {menu_data}")
     if str(menu_id) in menu_data["cached_menus"]:
         logger.info("Menu is available. Checking if requested week is available...")
         requested_menu = menu_data["cached_menus"][str(menu_id)]
