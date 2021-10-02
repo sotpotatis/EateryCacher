@@ -45,7 +45,7 @@ def generate_api_response_for(menu_id, week_number, day_number=None):
     if str(menu_id) in menu_data["cached_menus"]:
         logger.info("Menu is available. Checking if requested week is available...")
         requested_menu = menu_data["cached_menus"][str(menu_id)]
-        if requested_menu["menu"]["week"] != week_number and requested_menu["menu"]["week"] != None:
+        if requested_menu["menu"]["week_number"] != week_number and requested_menu["menu"]["week_number"] != None:
             logger.info("Menu is not available.")
             return generate_api_error_response("Menu for requested week is not available.", HTTPStatus.NOT_FOUND)
         else:
