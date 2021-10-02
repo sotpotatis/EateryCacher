@@ -39,6 +39,9 @@ def create_app():
     #Create a basic app
     app = Flask(__name__)
     CORS(app) #Enable CORS
+    """JSON keys are sorted by the code, so we don't want the server to
+    sort them."""
+    app.config["JSON_SORT_KEYS"] = False #Turn off key sorting
     #Register the server blueprint
     logger.info("Registering blueprint...")
     from server import app as server_blueprint
