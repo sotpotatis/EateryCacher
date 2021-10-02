@@ -2,17 +2,16 @@
 Provides an API interface/server that allows one to retrieve menu data.
 Uses Flask as a backend.
 '''
-from flask import Flask, jsonify, send_from_directory
-from shared_code import read_json_from_file, cached_data_filepath, EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH
+from flask import Blueprint, jsonify, send_from_directory
+from shared_code import read_json_from_file, cached_data_filepath, EATERY_KISTA_NOD_MENU_ID
 from menuparser import day_names_to_json_keys
 from http import HTTPStatus
-from configparser import ConfigParser
 import logging, datetime, pytz
 
 #Logging
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Blueprint(__name__, "server")
 
 def generate_api_response(status, content, status_code=200):
     '''Function for generating an API response following the response format
@@ -112,27 +111,3 @@ def specific_day_api(menu_id, week_number, day_number):
     logger.info(f"Response retrieved: {response}. Returning...")
     return jsonify(response), response["status_code"] #Return the response
 
-#Configuration
-logger.info("Reading configuration...")
-config = ConfigParser()
-config.read(CONFIG_FILEPATH)
-logger.debug("Config file read.")
-server_config = config["server"] #Get server config
-#(NOTE: server options below only affects the default Flask server environment)
-server_host = server_config["host"]
-server_port = int(server_config["port"])
-run_in_debug = server_config["debug"]
-run_server = config.getboolean("server", "run_using_default_server") #Whether the server should be ran using the default Flask server (load this as a boolean value)
-
-logger.info("Config read.")
-
-if run_server == True:
-    logger.info("Server should be ran. Running...")
-    logger.warning("""WARNING!
-    You are running the Flask default server. Only do this in a development
-    environment! For production use, use a WSGI server like Gunicorn instead.
-    (disable running the server by setting server/run_using_flask in the 
-    configuration file to false)""")
-    app.run(host=server_host, port=server_port, debug=run_in_debug)
-else:
-    logger.info("Server should not be ran from the server.py script.")
