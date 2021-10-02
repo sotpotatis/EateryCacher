@@ -6,6 +6,7 @@ import logging
 from configparser import ConfigParser
 from shared_code import CONFIG_FILEPATH
 from flask import Flask
+from flask_cors import CORS
 
 #Logging
 logger = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ def create_app():
     logger.info("Creating app...")
     #Create a basic app
     app = Flask(__name__)
+    CORS(app) #Enable CORS
     #Register the server blueprint
     logger.info("Registering blueprint...")
     from server import app as server_blueprint

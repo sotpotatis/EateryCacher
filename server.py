@@ -110,9 +110,3 @@ def specific_day_api(menu_id, week_number, day_number):
     response = generate_api_response_for(menu_id, week_number, day_number)
     logger.info(f"Response retrieved: {response}. Returning...")
     return jsonify(response), response["status_code"] #Return the response
-
-@app.after_request #CORS. Credit to https://stackoverflow.com/a/45818284!
-def after_request(response):
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    return response
