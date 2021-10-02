@@ -11,6 +11,27 @@ from flask_cors import CORS
 #Logging
 logger = logging.getLogger(__name__)
 
+#Set temporary log level, INFO
+logging.basicConfig(level=logging.INFO)
+
+#Read the configuration
+logger.info("Reading configuration...")
+config = ConfigParser()
+config.read(CONFIG_FILEPATH)
+logger.debug("Config file read.")
+server_config = config["server"] #Get server config
+#(NOTE: server options below only affects the default Flask server environment)
+server_host = server_config["host"]
+server_port = int(server_config["port"])
+run_in_debug = server_config["debug"]
+run_server = config.getboolean("server", "run_using_default_server") #Whether the server should be ran using the default Flask server (load this as a boolean value)
+logging_config = config["logging"]
+logging_level = int(logging_config["level"])
+logger.info("Config read.")
+
+#Set log level requested by user
+logging.basicConfig(level=logging_level)
+
 def create_app():
     '''Function for creating an app that can be ran
     using the Flask server (or any other WSGI server).'''
@@ -26,19 +47,7 @@ def create_app():
     logger.info("Blueprint registered. Returning app...")
     return app #Return the created app
 
-#Read the configuration
-logger.info("Reading configuration...")
-config = ConfigParser()
-config.read(CONFIG_FILEPATH)
-logger.debug("Config file read.")
-server_config = config["server"] #Get server config
-#(NOTE: server options below only affects the default Flask server environment)
-server_host = server_config["host"]
-server_port = int(server_config["port"])
-run_in_debug = server_config["debug"]
-run_server = config.getboolean("server", "run_using_default_server") #Whether the server should be ran using the default Flask server (load this as a boolean value)
 
-logger.info("Config read.")
 
 if run_server == True:
     logger.info("Server should be ran. Running...")
