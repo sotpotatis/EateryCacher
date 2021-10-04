@@ -26,7 +26,8 @@ logger.info("Settings loaded.")
 
 
 #The first thing to do is to apply the log level
-logging.basicConfig(level=logging_settings["level"])
+log_level = int(logging_settings["level"])
+logging.basicConfig(level=log_level)
 
 #Load the file cached.json, which stores cached menu data
 logger.info("Checking cached data...")
