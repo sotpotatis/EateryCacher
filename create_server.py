@@ -1,5 +1,7 @@
 '''create_server.py
 Offers an interface to create a server handling the API.
+As in, this file loads the server.py file, sets some configuration variables, and exposes an app
+that can be accessed with a WSGI server.
 '''
 
 import logging
