@@ -9,7 +9,7 @@ import os, logging, json
 logger = logging.getLogger(__name__)
 
 #Constants
-EATERY_KISTA_NOD_MENU_ID = 521 #The Eatery Kista nod menu ID
+EATERY_KISTA_NOD_MENU_ID = 2401 #The Eatery Kista nod menu ID
 
 #Grab paths
 SCRIPT_FILEPATH = os.path.realpath(__file__)
