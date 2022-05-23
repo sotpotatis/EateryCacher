@@ -7,6 +7,14 @@ Code may be subject to errors and stop work if the API changes. **Note:** Please
 > If you are a Eatery representative that is unhappy with this usage of the API, let me know and I will stop crawling data from you as well as make this
 repository read-only/archived and/or hidden.
 
+### Hosted versions
+
+A hosted version serving the Eatery Kista Nod menu is available at `https://lunchmeny.albins.website/`.
+
+A human-readable website using the menu API is available at `https://20alse.ssis.nu/lunch`.
+
+Or, you can of course set up your own server or just use the parsing scripts! Instructions can be found below.
+
 ### How the cacher works
 
 The cacher tries to download new data from the Eatery API and saves it onto a file called `cached.json`. This is done by *running the script*
