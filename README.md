@@ -15,6 +15,8 @@ The cacher tries to download new data from the Eatery API and saves it onto a fi
 *While the server file can be run directly*, it is **not** recommended unless you do some internal testing. In a production environment, use a server like
 Gunicorn (it's easy to set up, and Google is absolutely your friend here).
 
+An example command for hosting with Gunicorn is `gunicorn create_server:create_app() --bind=0.0.0.0:80`
+
 ### Configuring
 
 See the file `config.ini` for configuration of the EateryCacher.

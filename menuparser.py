@@ -77,7 +77,7 @@ class MenuParser:
             logger.debug(f"Parsing row content {row}...")
             found_day = None
             for day, day_id in day_names_to_json_keys.items():
-                if day in row: #If a day was found
+                if day.lower() in row.lower(): #If a day was found
                     logger.info(f"Found data for day {day}!")
                     found_day = current_day = day_id
                     result[found_day] = {
