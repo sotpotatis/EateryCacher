@@ -20,8 +20,14 @@ logger.info("Configuration file loaded. Loading parameters...")
 downloader_settings = config["downloader"]
 logging_settings = config["logging"]
 #Load which menu IDs to retrieve at this point, since this should be a list and therefore has an extra risk of giving an error
-menu_ids_to_retrieve = json.loads(downloader_settings["save_menu_ids"])
-logger.debug(f"Menus to load: {menu_ids_to_retrieve}")
+if "save_menu_ids" in downloader_settings:
+    if "save_menus" not in downloader_settings:
+        logger.critical("The save_menu_ids settings has been deprecated. Please use \"save_menus\" instead. See the example configuration file for more information.")
+        exit(1)
+    else:
+        logger.warning("The save_menu_ids settings has been deprecated. Please use \"save_menus\" instead. See the example configuration file for more information.")
+menus_to_load = json.loads(downloader_settings["save_menus"])
+logger.debug(f"Menus to load: {menus_to_load}")
 logger.info("Settings loaded.")
 
 
@@ -64,20 +70,22 @@ headers = {
 }
 logger.debug(f"Generated request headers: {headers}")
 logger.info("Sending request...")
-eatery_request = requests.get("https://api.eatery.se/wp-json/eatery/v1/menues", headers=headers)
-logger.info("Request to Eatery sent. Validating...")
+eatery_eateries_request = requests.get("https://api.eatery.se/wp-json/eatery/v1/eateries", headers=headers)
+eatery_menues_request = requests.get("https://api.eatery.se/wp-json/eatery/v1/menues", headers=headers)
+logger.info("Requests to Eatery sent. Validating...")
 
 #Validate the request
-if eatery_request.status_code == 200: #If we get a 200 status code
+if eatery_menues_request.status_code == eatery_eateries_request.status_code  == 200: #If we get a 200 status code
     logger.info("Status code is 200! Attempting to load JSON...")
     try:
-        eatery_request_json = eatery_request.json()
+        eatery_eateries_request_json = eatery_eateries_request.json()
+        eatery_menues_request_json = eatery_menues_request.json()
         logger.info("Loaded JSON from response with success.")
     except Exception as e:
         logger.critical("Failed to load JSON from Eatery API! The returned JSON is invalid.", exc_info=True)
         exit(1) #...exit with status code 1 (indicating an error)
 else:
-    logger.critical(f"Received an unexpected status code from Eatery's API, {eatery_request.status_code}.")
+    logger.critical(f"Received an unexpected status code from Eatery's API, {eatery_menues_request.status_code}.")
     exit(1) #...exit with status code 1 (indicating an error)
 
 #(if we get here, we have valid JSON data from the Eatery API)
@@ -85,18 +93,26 @@ logger.info("JSON data is valid. Loading menus...")
 
 
 #Iterate through each menu to load and grab its data
-for menu_id in menu_ids_to_retrieve:
-    if str(menu_id) in eatery_request_json: #If the menu content is available
-        logger.info(f"Menu {menu_id} is available. Sending to parser...")
-        #Send the menu over to the parser
-        menu_parser = MenuParser()
-        menu_output = menu_parser.parse(eatery_request_json[str(menu_id)])
-        logger.info(f"Got output {menu_output} for menu ID {menu_id}.")
-        #Add the menu data to the cached data content
-        cached_data_content["cached_menus"][str(menu_id)] = {"menu": menu_output, "last_retrieved_at": datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()}
-        logger.debug("Cached menu content was added in memory.")
-    else: #If the content for the menu ID is not available
-        logger.warning(f"Menu {menu_id} is not available from Eatery! It will not be included in the current save.")
+for menu_name in menus_to_load:
+    if not menu_name.startswith("/"): #Menu paths begin with a forward slash (for example /kista-nod). Therefore, document and add it in case someone forgot to do it :)
+        logger.warning(f"Automatically adding a slash (/) in front of the menu path \"{menu_name}\". To supress this warning, change your configuration file from {menu_name} to /{menu_name}.")
+        menu_name = f"/{menu_name}"
+    #Get the latest menu from the list of Eateries, This extra step has been added if Eatery changes their menu ID
+    if menu_name in eatery_eateries_request_json and "lunchmeny" in eatery_eateries_request_json[menu_name]["menues"]: #Check that menu is available and that a lunch menu is available from it
+        menu_id = eatery_eateries_request_json[menu_name]["menues"]["lunchmeny"]
+        if str(menu_id) in eatery_menues_request_json: #If the menu content is available
+            logger.info(f"Menu {menu_id} is available. Sending to parser...")
+            #Send the menu over to the parser
+            menu_parser = MenuParser()
+            menu_output = menu_parser.parse(eatery_menues_request_json[str(menu_id)])
+            logger.info(f"Got output {menu_output} for menu ID {menu_id}.")
+            #Add the menu data to the cached data content
+            cached_data_content["cached_menus"][str(menu_name)] = {"menu": menu_output, "menu_id": menu_id, "last_retrieved_at": datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()}
+            logger.debug("Cached menu content was added in memory.")
+        else: #If the content for the menu ID is not available
+            logger.warning(f"Menu {menu_id} is not available from Eatery! It will not be included in the current save.")
+    else:
+        logger.warning(f"Menu for {menu_name} is not available from Eatery! It will not be included in the current save.")
 
 logger.info("Menu iteration completed. Adding last updated date and saving to file...")
 cached_data_content["menu_last_updated_at"] = datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()

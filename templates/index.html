@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Eatery Menu API</title>
+    <!-- Meta tags -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800 min-h-screen p-5 flex flex-col text-white justify-center align-center place-items-center">
+<div class="w-3/4 flex-col space-y-3">
+<h1 class="text-5xl font-bold">Eatery Menu API</h1>
+<p class="text-xl">This web page hosts a lunch meny API for Eatery restaurants.</p>
+<p class="text-xl">Currently cached restaurants are: {{ ",".join(saved_menus_list) }})</p>
+<div id="warning" class="bg-red-600 rounded-lg border-2 border-white p-3">
+    <h3 class="text-lg font-bold">Note:</h3>
+    <p>Please note that the API is entirely unofficial and is not run by anyone that is associated with Eatery.
+    {# Provide host email address if set in the configuration #}
+    {% if host_email_address is not none %}
+    If you are a representative from Eatery and you do not like this website being ran, please contact the <a href="mailto:{{host_email_address}}" class="underline hover:cursor-pointer">website administrator</a>.
+    {% endif %}
+    </p>
+</div>
+<h3 class="text-2xl font-bold">How to interact with the API</h3>
+<h3 class="text-xl font-bold">Endpoints</h3>
+<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/</span> Get the default menu for the current week.</p>
+<p>This endpoint will use the default server restaurant, which is {{ default_menu_id }}.
+It will retrieve the lunch menu for the restaurant for the current week in Swedish timezone.</p>
+<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/{menu_id}/{week_number}</span> Get a menu for a requested week</p>
+    <p>This endpoint works like the <a>Get the default menu for the current week</a> endpoint but with further customizability.</p>
+<p class="font-bold">Parameter: menu_id</p>
+    The Eatery restaurant to retrieve the cached menu for. The IDs can be found <a class="underline hover:cursor:pointer" href="" target="_blank">here</a> (the IDs are the keys at the top level in the response JSON, for example "kista_nod").
+    <span>Note that not all Eatery restaurants may be cached on this server. The actively cached restaurants are:</span>
+    <ul class="list-disc">
+    {# Show cached menu IDs as set in the configuration file #}
+    {% for saved_menu in saved_menus_list %}
+        <li>{{ saved_menu }}</li>
+    {% endfor %}
+    </ul>
+    <div class="bg-gray-400 text-black p-3 rounded-lg border-2 border-white">
+        <h5 class="font-bold">Note</h5>
+        <p>On May 31, 2022, the format of the menu ID parameter was switched to instead primarily accept an ID like "kista_nod". This is since Eatery tends to change their menu ID every once in a while,
+        but providing the ID like this will allow the API to avoid that issue.
+        <br>
+            To access menus, you can still use the menu ID (for example 2401), but it is not recommended in case Eatery changes it.
+        </p>
+    </div>
+<p class="font-bold">Parameter: week_number</p>
+<p>The week number to get the menu for.</p>
+<h3 class="text-xl font-bold">Expected responses</h3>
+<p>If the requested menu is cached on the server, you should get a response like this:</p>
+<div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
+    <p>{
+    "menu": {
+    "title": "Lunchmeny Eatery Kista Nod v. 22",
+    "week_number": 22,
+    "days": {
+    "monday": {
+    "day_name": {
+    "swedish": "Måndag",
+    "english": "Monday"
+    },
+    "dishes": [
+    "Fläskkarré med bearnaisesås och råstekt potatis",
+    "Panerad spättafilé med citronmajonnäs och ris",
+    "Fried rice med oumph"
+    ],
+    "special_features": {
+    "sweet_tuesday": false,
+    "fruity_wednesday": false,
+    "pancake_thursday": false,
+    "burger_friday": false
+    }
+    },
+    "tuesday": {
+    ...
+    },
+    "wednesday": {
+    ...
+    },
+    "thursday": {
+    ...
+    },
+    "friday": {
+    ...
+    },
+    "footer": "Allergi? Fråga oss!\nLunch 107kr. med Eaterykortet (ordinarie pris 119kr.) Serveras mellan 10.30 och 14.00\nBröd, sallad, mineralvatten och kaffe/te ingår"
+    },
+    "last_retrieved_at": 1654016402.921905,
+    "status": "success",
+    "status_code": 200
+    }<p>
+</div>
+    <p>If the requested menu does not exist on the server, you will get a 404 Not Found response.</p>
+    <p>If the parameters passed are invalid, you will get a 400 Bad Request response.</p>
+    <p>All other status codes are unexpected and might indicate an error with the server.</p>
+    <p>For the status codes that are expected, the server should return a JSON that indicates what went wrong, for example:</p>
+    <div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
+        {
+        "message": "Menu ID not available.",
+        "status": "error",
+        "status_code": 404
+        }
+    </div>
+    <hr class="w-full">
+    <h3 class="text-lg font-bold">More</h3>
+    <p>This server is using fully open source code! You can find the project on GitHub <a href="https://github.com/sotpotatis/EateryCacher" class="underline hover:cursor-pointer" target="_blank">here</a>.</p>
+    </div>
+</body>
+</html>

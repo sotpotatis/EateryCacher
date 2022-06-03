@@ -2,7 +2,7 @@
 
 EateryCacher is a simple HTML-to-human menu converter, which can be used to get lunch data from Eatery Restaurants.
 
-> *Note:* EateryCacher uses unoffical APIs (they are used on Eatery's website, but there is no official documentation available).
+> *Note:* EateryCacher uses inoffical APIs (they are used on Eatery's website, but there is no official documentation available).
 Code may be subject to errors and stop work if the API changes. **Note:** Please do not misuse the API, especially since it is unofficial.
 > If you are a Eatery representative that is unhappy with this usage of the API, let me know and I will stop crawling data from you as well as make this
 repository read-only/archived and/or hidden.

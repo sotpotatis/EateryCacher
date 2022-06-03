@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!-- index_ssis
+Override index in Swedish that describes the API that I made this script for,
+which is the lunch API for Stockholm Science & Innovation School.
+-->
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Eatery Menu API</title>
+    <!-- Meta tags -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+</head>
+<body class="bg-cyan-900 min-h-screen p-5 flex flex-col text-white justify-center align-center place-items-center">
+<div class="w-3/4 flex-col space-y-3">
+<h1 class="text-[1200%] font-bold"><span class="iconify" data-icon="emojione-monotone:fork-and-knife-with-plate"></span></h1>
+<h1 class="text-5xl font-bold">Eatery Lunch API</h1>
+<p class="text-xl">Ett API för att hämta den aktuella lunchmenyn på SSIS.</p>
+<div id="warning" class="bg-cyan-600 rounded-lg border-2 border-white p-3">
+    <h3 class="text-lg font-bold">Notera:</h3>
+    <p>Vänligen notera att detta är ett helt inofficiellt API och drivs inte av Eatery eller någon som är associerad med de.
+    {# Provide host email address if set in the configuration #}
+    {% if host_email_address is not none %}
+    Om du arbetar på Eatery och inte tycker om att denna hemsida körs, vänligen kontakta <a href="mailto:{{host_email_address}}" class="underline hover:cursor-pointer">hemsidesadministratören</a>.
+    {% endif %}
+    </p>
+</div>
+    {% if statistics_data is not none %}
+    <h3 class="text-2xl font-bold">Statistik</h3>
+    <p><ul class="list-disc">
+    <li><b>Förfrågningar idag:</b> {{ statistics_data.requests.daily.count }} st</li>
+    <li><b>Förfrågningar denna vecka:</b> {{ statistics_data.requests.weekly.count }} st</li>
+    <li><b>Förfrågningar denna månad:</b> {{ statistics_data.requests.monthly.count }} st</li>
+    <li><b>Totalt:</b> {{ statistics_data.requests.all_time.count }} st</li>
+    </ul></p>
+    {% endif %}
+<h3 class="text-2xl font-bold">Hur du interagerar med API:et</h3>
+<h3 class="text-xl font-bold">Endpoints</h3>
+<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/</span> Hämta aktuell lunchmeny</p>
+<p>Denna endpoint hämtar den aktuella lunchmenyn för den nuvarande veckan (i svensk tidszon). Det är det enklaste och smidigaste sättet att hämta den aktuella menyn.</p>
+<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/{menu_id}/{week_number}</span> Get a menu for a requested week</p>
+    <p>Denna endpoint fungerar som <a>Hämta aktuell lunchmeny</a>-endpointen, men tillåter lite mer anpassning.</p>
+<p class="font-bold">Parameter: menu_id</p>
+    Eatery-restaurangen som menyn ska hämtas för. All Eaterys restaurang-ID:n kan hittas <a class="underline hover:cursor:pointer" href="" target="_blank">här</a> (ID:na är toppnivånycklarna i JSON-svaret, till exemple "kista_nod").
+    <span>Notera att denna parameter endast har ett möjligt värde då den endast sparar menyn på Eatery Kista Nod!</span>
+    <div class="bg-cyan-600 p-3 rounded-lg border-2 border-white">
+        <h5 class="font-bold">Notera:</h5>
+        <p>31 maj 2022 så ändrades formatet för meny-ID:t för att primärt acceptera ett textbaserat ID som t.ex. "kista_nod". Detta på grund av att Eatery tenderar att ändra sitt meny-ID lite då och då,
+           och genom att istället ha ID:t på detta sätt så kan API:et gå runt det problemet.
+        <br>
+            Du kan fortfarande använda meny-ID:t (till exempel 2401) för att komma åt menyer, men det rekommenderas inte ifall Eatery ändrar det.
+        </p>
+    </div>
+<p class="font-bold">Parameter: week_number</p>
+<p>Veckonumret som du vill hämta menyn för.</p>
+<h3 class="text-xl font-bold">Förväntade svar</h3>
+<p>Om den efterfrågade menyn finns på servern så borde du få ett svar i stil med detta:</p>
+<div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
+    <p>{
+    "menu": {
+    "title": "Lunchmeny Eatery Kista Nod v. 22",
+    "week_number": 22,
+    "days": {
+    "monday": {
+    "day_name": {
+    "swedish": "Måndag",
+    "english": "Monday"
+    },
+    "dishes": [
+    "Fläskkarré med bearnaisesås och råstekt potatis",
+    "Panerad spättafilé med citronmajonnäs och ris",
+    "Fried rice med oumph"
+    ],
+    "special_features": {
+    "sweet_tuesday": false,
+    "fruity_wednesday": false,
+    "pancake_thursday": false,
+    "burger_friday": false
+    }
+    },
+    "tuesday": {
+    ...
+    },
+    "wednesday": {
+    ...
+    },
+    "thursday": {
+    ...
+    },
+    "friday": {
+    ...
+    },
+    "footer": "Allergi? Fråga oss!\nLunch 107kr. med Eaterykortet (ordinarie pris 119kr.) Serveras mellan 10.30 och 14.00\nBröd, sallad, mineralvatten och kaffe/te ingår"
+    },
+    "last_retrieved_at": 1654016402.921905,
+    "status": "success",
+    "status_code": 200
+    }<p>
+</div>
+    <p>Om den efterfrågade menyn inte finns på servern så kommer du att få ett 404 Not Found-svar.</p>
+    <p>Om parametrar till API:et är ogilltiga så kommer du få ett 400 Bad Request-svar.</p>
+    <p>Alla andra statuskoder är oväntade och kan indikera ett möjligt fel på servern.</p>
+    <p>För de felmeddelanden som är korrekt hanterade av servern så kommer du att få ett JSON-svar som berättar mer om vad som gick fel:</p>
+    <div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
+        {
+        "message": "Menu ID not available.",
+        "status": "error",
+        "status_code": 404
+        }
+    </div>
+    <hr class="w-full">
+    <p class="flex flex-row gap-3"><a href="https://github.com/sotpotatis/EateryCacher" class="underline hover:cursor-pointer" target="_blank"><span class="iconify" data-icon="akar-icons:github-fill"></span></a>
+        {% if host_email_address is not none %}<a href="mailto:{{ host_email_address }}" class="underline hover:cursor-pointer" target="_blank"><span class="iconify" data-icon="entypo:mail"></span></a></p>{% endif %}
+    </div>
+</body>
+</html>
