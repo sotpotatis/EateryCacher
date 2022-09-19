@@ -1,0 +1,22 @@
+name: Update Tailwind CSS
+on: [push]
+jobs:
+  Update-Tailwind-CSS:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Install npm
+        uses: actions/setup-node
+        with:
+          node-version: 16
+      - name: Install Tailwind
+        run: npm install tailwindcss
+      - name: Run code to update CSS
+        run: npx tailwindcss -i ./src/css/input.css -o ./static/css/output.css
+      - name: Commit changes
+        run: |
+          git config --global user.name "GitHub actions"
+          git config --global user.email "sotpotatis@users.noreply.github.com"
+          git commit -m "Build Tailwind code"
+          git push

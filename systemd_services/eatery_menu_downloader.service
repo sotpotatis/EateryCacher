@@ -1,0 +1,6 @@
+[Unit]
+Description=Runs the Eatery meny downloader code.
+[Service]
+ExecStart=run_menu_downloader.sh
+[Install]
+WantedBy=multi-user.target

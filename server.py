@@ -138,6 +138,10 @@ def generate_api_response_for(menu_name, week_number, day_number=None):
         logger.info("Menu is not available. Returning error response...")
         return generate_api_error_response("Menu ID not available.", HTTPStatus.NOT_FOUND)
 
+def timestamp_to_local_time(timestamp_str):
+    '''Converts a timestamp from a timestamp string to local Swedish time.'''
+    return datetime.datetime.fromisoformat(timestamp_str).astimezone(tz=pytz.timezone("Europe/Stockholm"))
+
 def increase_statistics_file_api_count():
     '''There is a statistics file which tracks how often the API has been accessed.
     This function can write to it.'''
@@ -149,20 +153,20 @@ def increase_statistics_file_api_count():
         requests_data = statistics_data["requests"]
         STATISTICS_FUNCTIONS_ROTATE = {
             "all_time": lambda x: False,
-            "weekly": lambda timestamp: relativedelta(timestamp -
-                                                      datetime.datetime.fromisoformat(requests_data["weekly"]["refreshed"]).astimezone(tz=pytz.timezone("Europe/Stockholm"))).weeks >= 1,
-            "monthly": lambda timestamp: relativedelta(timestamp -
-                                                       datetime.datetime.fromisoformat(requests_data["monthly"]["refreshed"]).astimezone(tz=pytz.timezone("Europe/Stockholm"))).months >= 1,
-            "daily": lambda timestamp: relativedelta(timestamp -
-                                                       datetime.datetime.fromisoformat(requests_data["daily"]["refreshed"]).astimezone(tz=pytz.timezone("Europe/Stockholm"))).days >= 1,
+            "weekly": lambda now: relativedelta(now, timestamp_to_local_time(requests_data["weekly"]["refreshed"])).weeks >= 1,
+            "monthly": lambda now: relativedelta(now, timestamp_to_local_time(requests_data["monthly"]["refreshed"])).months >= 1,
+            "daily": lambda now: relativedelta(now, timestamp_to_local_time(requests_data["daily"]["refreshed"])).days >= 1,
         } #Functions to check if data should be rotated or not.
+        # Rotate statistics data if needed
         logger.info("(Possibly) rotating statistics data...")
+        now = get_now()
         for statistics_key, statistics_function in STATISTICS_FUNCTIONS_ROTATE.items():
             #Evaluate
-            if STATISTICS_FUNCTIONS_ROTATE[statistics_key](datetime.datetime.fromisoformat(statistics_data["requests"][statistics_key]["refreshed"])):
+            if STATISTICS_FUNCTIONS_ROTATE[statistics_key](now):
                 logger.info(f"Rotating statistics {statistics_key}...")
-                statistics_data["requests"][statistics_key] = {"count": 0, "refreshed": str(get_now())}
+                statistics_data["requests"][statistics_key] = {"count": 0, "refreshed": str(now)}
                 logger.info(f"{statistics_key} rotated in memory.")
+        # Increase request counts by one
         for key in statistics_data["requests"].keys():
             statistics_data["requests"][key]["count"] += 1
         logger.info("Writing updated statistics...")

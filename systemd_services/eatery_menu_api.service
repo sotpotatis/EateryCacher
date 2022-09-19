@@ -1,0 +1,6 @@
+[Unit]
+Description=Starts and runs the API server for providing Eatery menu data.
+[Service]
+ExecStart=start_menu_api.sh
+[Install]
+WantedBy=multi-user.target
