@@ -1,3 +1,4 @@
+#!/bin/bashF
 #start_menu_api.sh
 #Starts the server to run the menu API.
 #Assumes the install position /home/ubuntu/eatery_menu/EateryCacher.

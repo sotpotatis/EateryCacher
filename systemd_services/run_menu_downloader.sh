@@ -1,3 +1,4 @@
+#!/bin/bash
 #run_menu_downloader.py
 #Runs the code to download the menu from Eatery.
 #Assumes the install position /home/ubuntu/eatery_menu/EateryCacher.

@@ -1,6 +1,6 @@
 [Unit]
 Description=Starts and runs the API server for providing Eatery menu data.
 [Service]
-ExecStart=/home/ubuntu/eatery_menu/EateryCacher/start_menu_api.sh
+ExecStart=/home/ubuntu/eatery_menu/EateryCacher/systemd_services/start_menu_api.sh
 [Install]
 WantedBy=multi-user.target
