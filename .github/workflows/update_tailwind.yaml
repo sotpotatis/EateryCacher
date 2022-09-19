@@ -13,7 +13,7 @@ jobs:
       - name: Install Tailwind
         run: npm install tailwindcss
       - name: Run code to update CSS
-        run: npx tailwindcss -i ./src/css/input.css -o ./static/css/output.css
+        run: npx tailwindcss -c tailwind.config.js -i ./src/css/input.css -o ./static/css/output.css
       - name: Commit changes
         run: |
           git config --global user.name "GitHub actions"

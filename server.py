@@ -99,11 +99,12 @@ def generate_api_response_for(menu_name, week_number, day_number=None):
     if is_digit:
         logger.info("Trying to find menu ID...")
         found_menu_name = None
-        for individual_menu_name, individual_menu_data in menu_data["cached_menus"]:
-            if "menu_id" in individual_menu_data and individual_menu_data["menu_id"].items() == menu_name:
+        for individual_menu_name, individual_menu_data in menu_data["cached_menus"].items():
+            if "menu_id" in individual_menu_data and individual_menu_data["menu_id"] == menu_name:
                 logger.info("Found menu ID.")
                 found_menu_name = individual_menu_name
-        if found_menu_name == None:
+                menu_name = found_menu_name
+        if found_menu_name is None:
             logger.info("Requested menu ID was not found.")
             return generate_api_error_response("Menu ID not available (menu ID was not found on the server - to (possibly) prevent this in the future you can use the API string ID instead). Refer to the documentation for more information.", HTTPStatus.NOT_FOUND)
     #Retrieve menu
@@ -133,10 +134,9 @@ def generate_api_response_for(menu_name, week_number, day_number=None):
                 else:
                     logger.info("Custom day is available!")
                     return generate_api_response("success", {requested_menu["menu"]["days"][requested_day_key]}) #Get the menu for that day
-
     else:
         logger.info("Menu is not available. Returning error response...")
-        return generate_api_error_response("Menu ID not available.", HTTPStatus.NOT_FOUND)
+        return generate_api_error_response("Menu is not available.", HTTPStatus.NOT_FOUND)
 
 def timestamp_to_local_time(timestamp_str):
     '''Converts a timestamp from a timestamp string to local Swedish time.'''
