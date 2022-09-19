@@ -47,7 +47,7 @@ which is the lunch API for Stockholm Science & Innovation School.
 <p class="font-bold">Parameter: menu_id</p>
     Eatery-restaurangen som menyn ska hämtas för. All Eaterys restaurang-ID:n kan hittas <a class="underline hover:cursor:pointer" href="" target="_blank">här</a> (ID:na är toppnivånycklarna i JSON-svaret, till exempel "kista_nod").
     Notera dock att <b>endast</b> följande menyer sparas på servern:
-    <ul>
+    <ul class="list-disc">
     {%- for menu_id in saved_menus_list %}
         <li>{{ menu_id }}</li>
     {% endfor -%}
