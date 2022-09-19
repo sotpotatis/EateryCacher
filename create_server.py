@@ -53,7 +53,7 @@ def create_app():
     return app #Return the created app
 
 
-
+app = create_app()
 if run_server == True:
     logger.info("Server should be ran. Running...")
     logger.warning("""WARNING!
@@ -61,7 +61,6 @@ if run_server == True:
     environment! For production use, use a WSGI server like Gunicorn instead.
     (disable running the server by setting server/run_using_flask in the 
     configuration file to false)""")
-    app = create_app()
     app.run(host=server_host, port=server_port, debug=run_in_debug)
 else:
     logger.info("Server should not be ran from the server.py script.")
