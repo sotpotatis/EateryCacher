@@ -2,11 +2,11 @@
 Provides an API interface/server that allows one to retrieve menu data.
 Uses Flask as a backend.
 '''
+import logging, datetime, pytz, os, json
 from flask import Blueprint, jsonify, send_from_directory, render_template
 from shared_code import read_json_from_file, cached_data_filepath, EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH, statistics_data_file_path, write_json_to_file, read_json_from_file, get_now
 from menuparser import day_names_to_json_keys
 from http import HTTPStatus
-import logging, datetime, pytz, os
 from configparser import ConfigParser
 from dateutil.relativedelta import relativedelta
 
@@ -21,7 +21,7 @@ config = ConfigParser()
 config.read(CONFIG_FILEPATH) #Read the configuration filepath
 logger.info("Configuration file loaded. Loading parameters...")
 SHOW_INDEX_FILE = config["server"]["show_index"] if "show_index" in config["server"] else False #Load whether to show the index page or not
-saved_menus = config["downloader"]["save_menus"] #This is used for the index file
+saved_menus = json.loads(config["downloader"]["save_menus"]) #This is used for the index file
 HOST_EMAIL_ADDRESS = config["server"]["host_email"] if "host_email" in config["server"] else None #Load contact email to server host
 STATISTICS_FILE_ENABLED = config["server"]["track_statistics"] if "track_statistics" in config["server"] else True #Check whether to track statistics from the API or not
 CUSTOM_INDEX_FILE = config["server"]["custom_index_file"] if "custom_index_file" in config["server"] else None #Load a custom index file if configured
@@ -181,7 +181,7 @@ if SHOW_INDEX_FILE:
         logger.info("Got a request to the index. Returning...")
         statistics_data = read_json_from_file(statistics_data_file_path) if STATISTICS_FILE_ENABLED else None #Load statistics data
         return render_template("index.html" if not CUSTOM_INDEX_FILE else CUSTOM_INDEX_FILE,
-                               saved_menus_list=config["downloader"]["save_menus"],
+                               saved_menus_list=saved_menus,
                                default_menu_id=EATERY_KISTA_NOD_MENU_ID,
                                host_email_address=HOST_EMAIL_ADDRESS,
                                statistics_data=statistics_data)
