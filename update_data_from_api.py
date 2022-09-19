@@ -63,10 +63,15 @@ else:
 logger.info("An update should be performed. Downloading data from Eatery...")
 
 #Create a fake user-agent (yes, this is a bit fishy, but this is done to get past any possible user agent filters, since at least we're using the data for good purpose!)
-fake_user_agent = FakeUserAgent()
-#Create request headers with the fake user agent
+try:
+    fake_user_agent = FakeUserAgent()
+    #Create request headers with the fake user agent
+    user_agent = fake_user_agent.random
+except Exception as e:
+    logger.warning(f"Fake user agent failed with exception {e}! Using bypass.", exc_info=True)
+    user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:104.0) Gecko/20100101 Firefox/104.0"
 headers = {
-    "User-Agent": fake_user_agent.random
+    "User-Agent": user_agent
 }
 logger.debug(f"Generated request headers: {headers}")
 logger.info("Sending request...")
