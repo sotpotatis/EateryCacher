@@ -189,7 +189,6 @@ def api():
     #Generate response
     response = generate_api_response_for(EATERY_KISTA_NOD_MENU_ID, current_week)
     logger.info(f"Response retrieved: {response}. Returning...")
-    raise Exception
     return jsonify(response), response["status_code"] #Return the response
 
 @app.route("/api/<string:menu_id>/<int:week_number>")
