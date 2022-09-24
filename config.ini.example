@@ -1,0 +1,14 @@
+[downloader]
+save_menus=["/kista-nod"]
+allow_download_every_minutes=30
+[server]
+host=127.0.0.1
+port=80
+debug=false
+run_using_default_server=true
+show_index=true
+host_email=your_email_here@example.com
+track_statistics=true
+custom_index_file=index.html
+[logging]
+level=20

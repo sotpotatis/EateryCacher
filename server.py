@@ -2,9 +2,13 @@
 Provides an API interface/server that allows one to retrieve menu data.
 Uses Flask as a backend.
 '''
-import logging, datetime, pytz, os, json
+import logging, datetime, pytz, os, json, menu_caching
+import traceback
+
+import werkzeug.exceptions
 from flask import Blueprint, jsonify, send_from_directory, render_template
-from shared_code import read_json_from_file, cached_data_filepath, EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH, statistics_data_file_path, write_json_to_file, read_json_from_file, get_now
+from werkzeug.exceptions import HTTPException
+from shared_code import EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH, statistics_data_file_path, write_json_to_file, read_json_from_file, get_now, CACHED_MENUS_DIRECTORY
 from menuparser import day_names_to_json_keys
 from http import HTTPStatus
 from configparser import ConfigParser
@@ -90,53 +94,37 @@ def generate_api_response_for(menu_name, week_number, day_number=None):
     is_digit = menu_name.isdigit()
     if not is_digit and not menu_name.startswith("/"): #This is done to match the format of the configuration files. It's not smart to have slashes to fill out the ID in a URL :)
         menu_name = f"/{menu_name}"
-    elif is_digit:
-        menu_name = int(menu_name)
-    #Grab menu data
-    menu_data = read_json_from_file(cached_data_filepath)
-    logger.debug(f"Menu data: {menu_data}")
-    #If the requested menu ID is a string, we can simply retrieve it right away. If not, we have to try to find the menu string that belongs to the menu ID
-    if is_digit:
-        logger.info("Trying to find menu ID...")
-        found_menu_name = None
-        for individual_menu_name, individual_menu_data in menu_data["cached_menus"].items():
-            if "menu_id" in individual_menu_data and individual_menu_data["menu_id"] == menu_name:
-                logger.info("Found menu ID.")
-                found_menu_name = individual_menu_name
-                menu_name = found_menu_name
-        if found_menu_name is None:
-            logger.info("Requested menu ID was not found.")
-            return generate_api_error_response("Menu ID not available (menu ID was not found on the server - to (possibly) prevent this in the future you can use the API string ID instead). Refer to the documentation for more information.", HTTPStatus.NOT_FOUND)
     #Retrieve menu
-    if menu_name in menu_data["cached_menus"]:
-        logger.info("Menu is available. Checking if requested week is available...")
-        requested_menu = menu_data["cached_menus"][str(menu_name)]
-        if requested_menu["menu"]["week_number"] != week_number and requested_menu["menu"]["week_number"] != None:
-            logger.info("Menu is not available.")
-            return generate_api_error_response("Menu for requested week is not available.", HTTPStatus.NOT_FOUND)
+    requested_menu = menu_caching.get_cached_menu(menu_name, week_number)
+    if requested_menu is not None:
+        logger.info("Menu is available. Returning response...")
+        #If a specific day hasn't been requested...
+        if day_number == None:
+            return generate_api_response("success", requested_menu) #...return the full menu
         else:
-            logger.info("Menu is available. Returning response...")
-            #If a specific day hasn't been requested...
-            if day_number == None:
-                return generate_api_response("success", requested_menu) #...return the full menu
+            logger.debug("Custom day has been specified! Checking and returning...")
+            if day_number > len(day_names_to_json_keys): #If the passed day number is not in the list of keys (there should be error-checking for this implemented in the server, so unless this function is called externally, this error should not be triggered)
+                logger.warning("Invalid length passed!")
+                return generate_api_error_response("Unknown day number passed.", HTTPStatus.BAD_REQUEST)
             else:
-                logger.debug("Custom day has been specified! Checking and returning...")
-                if day_number > len(day_names_to_json_keys): #If the passed day number is not in the list of keys (there should be error-checking for this implemented in the server, so unless this function is called externally, this error should not be triggered)
-                    logger.warning("Invalid length passed!")
-                    return generate_api_error_response("Unknown day number passed.", HTTPStatus.BAD_REQUEST)
-                else:
-                    requested_day_key = list(day_names_to_json_keys.values())[day_number-1]
-                    logger.info(f"Requested day: {requested_day_key}")
-                logger.debug("Checking for existence of the requested day..")
-                if requested_day_key not in requested_menu["menu"]["days"]:
-                    logger.info("Custom day is not available!")
-                    return generate_api_error_response("Requested day is not available.", HTTPStatus.BAD_REQUEST)
-                else:
-                    logger.info("Custom day is available!")
-                    return generate_api_response("success", {requested_menu["menu"]["days"][requested_day_key]}) #Get the menu for that day
+                requested_day_key = list(day_names_to_json_keys.values())[day_number-1]
+                logger.info(f"Requested day: {requested_day_key}")
+            logger.debug("Checking for existence of the requested day..")
+            if requested_day_key not in requested_menu["menu"]["days"]:
+                logger.info("Custom day is not available!")
+                return generate_api_error_response("Requested day is not available.", HTTPStatus.BAD_REQUEST)
+            else:
+                logger.info("Custom day is available!")
+                day_data = requested_menu["menu"]["days"][requested_day_key]
+                del requested_menu["menu"]["days"]  # Remove day data but keep everything else for the response
+                return generate_api_response("success", {"menu_info": requested_menu, "day_menu": day_data}) #Get the menu for that day
     else:
         logger.info("Menu is not available. Returning error response...")
-        return generate_api_error_response("Menu is not available.", HTTPStatus.NOT_FOUND)
+        if is_digit:
+            return generate_api_error_response("Menu is not available.", HTTPStatus.NOT_FOUND)
+        else:
+            return generate_api_error_response("Menu ID not available (menu ID was not found on the server - to (possibly) prevent this in the future you can use the API string ID instead). Refer to the documentation for more information.", HTTPStatus.NOT_FOUND)
+
 
 def timestamp_to_local_time(timestamp_str):
     '''Converts a timestamp from a timestamp string to local Swedish time.'''
@@ -184,7 +172,7 @@ if SHOW_INDEX_FILE:
                                saved_menus_list=saved_menus,
                                default_menu_id=EATERY_KISTA_NOD_MENU_ID,
                                host_email_address=HOST_EMAIL_ADDRESS,
-                               statistics_data=statistics_data)
+                               statistics_data=statistics_data) # Render index file, passing dynamic content
 else:
     logger.info("Not registering index file since it has been configured not to be set.")
 
@@ -201,6 +189,7 @@ def api():
     #Generate response
     response = generate_api_response_for(EATERY_KISTA_NOD_MENU_ID, current_week)
     logger.info(f"Response retrieved: {response}. Returning...")
+    raise Exception
     return jsonify(response), response["status_code"] #Return the response
 
 @app.route("/api/<string:menu_id>/<int:week_number>")
@@ -228,3 +217,57 @@ def specific_day_api(menu_id, week_number, day_number):
     response = generate_api_response_for(menu_id, week_number, day_number)
     logger.info(f"Response retrieved: {response}. Returning...")
     return jsonify(response), response["status_code"] #Return the response
+
+@app.route("/api/available_menus")
+def available_menus_api():
+    '''Available menus API. Returns the available menus and their saved weeks.'''
+    logger.info("Got a request to the available menus API. Generating response...")
+    menus_data = {"available_menus": {}}
+    for menu_id in os.listdir(CACHED_MENUS_DIRECTORY):  # For all menus
+        menu_path = os.path.join(CACHED_MENUS_DIRECTORY, menu_id)
+        available_weeks = []
+        for week in os.listdir(menu_path):  # For all cached weeks in each menu
+            week_number = int(week)
+            week_path = menu_caching.get_cached_menu_directory(menu_id, week_number)
+            # Validate that menu data file exists
+            menu_data_file = os.path.join(week_path, "data.json")
+            if os.path.exists(menu_data_file):
+                available_weeks.append(week_number)
+            else:
+                logger.warning(f"Directory but no data file available for menu {menu_id}, week {week}.")
+        menus_data["available_menus"][menu_id] = {"available_weeks": available_weeks}
+    logger.info("Done iterating over menus. Returning response...")
+    response = generate_api_response("success", menus_data)
+    return jsonify(response)
+
+@app.app_errorhandler(werkzeug.exceptions.NotFound)
+def not_found_error_handler(e):
+    '''Handles 404 errors on the page.'''
+    logger.info("Handling a 404 error!")
+    error_message = "The requested page was not found on the server. You're most likely entering an invalid URL."
+    # Add extra information in case the index file (with documentation) is enabled.
+    if SHOW_INDEX_FILE:
+        error_message += " See the documentation at the index page of this website to find all the valid endpoints."
+    response = generate_api_error_response(error_message, 404)
+    logger.info("Returning error response to user...")
+    return jsonify(response), 404
+
+@app.app_errorhandler(Exception)
+def error_handler(e):
+    '''Handles 500 errors.'''
+    if isinstance(e, HTTPException):
+        logger.info("Ignored HTTP exception.")
+        return e
+    logger.critical(f"Handling an internal server error: {e}.", exc_info=True)
+    # Try to pretty-print the exception
+    try:
+        traceback.print_exc()
+    except:
+        logger.info("Detailed logging information is not available.")
+    error_message = "Sorry, an unexpected internal server occurred. Retry the request or try again later."
+    # Add extra information in case index file (with documentation) is enabled.
+    if SHOW_INDEX_FILE:
+        error_message += " If the error persists, try contacting the API maintainer. There might be contact information on the index page of this website."
+    response = generate_api_error_response(error_message, 500)
+    logger.info("Returning error response to user...")
+    return jsonify(response), 500

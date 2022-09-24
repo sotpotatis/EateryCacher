@@ -1,3 +1,8 @@
 node_modules/
 package-lock.json
 package.json
+cached/
+cached.json
+config.ini
+statistics.json
+status.json

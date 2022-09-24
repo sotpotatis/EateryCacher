@@ -2,9 +2,9 @@
 Updates data from the Eatery API and saves it into a data file
 '''
 from configparser import ConfigParser
-from shared_code import CONFIG_FILEPATH, SCRIPT_DIRECTORY, write_json_to_file, read_json_from_file, cached_data_filepath
+from shared_code import CONFIG_FILEPATH, write_json_to_file, read_json_from_file, status_data_filepath, get_now
 from fake_useragent import FakeUserAgent
-import logging, os, time, requests, json, datetime, pytz
+import logging, os, time, requests, json, datetime, pytz, menu_caching
 from menuparser import MenuParser
 
 #Set up logging by creating a logger
@@ -35,21 +35,22 @@ logger.info("Settings loaded.")
 log_level = int(logging_settings["level"])
 logging.basicConfig(level=log_level)
 
-#Load the file cached.json, which stores cached menu data
+#Load the file status.json, which stores when menus were last updated
 logger.info("Checking cached data...")
-if not os.path.exists(cached_data_filepath): #If the cached data does not exist
+if not os.path.exists(status_data_filepath): #If the cached data does not exist
     logger.info("Cached data file does not exist. Creating file...")
-    write_json_to_file({"cached_menus": {}, "menu_last_updated_at": None}, cached_data_filepath) #Write default JSON
+    status_content = {"menus_last_updated_at": None}
+    write_json_to_file(status_content, status_data_filepath) #Write default JSON
 else:
     logger.info("Cached data file exists. Reading file data...")
 
-    #Not performing too many updates is done by checking the menu_last_updated_at key. It is saved as a unix timestamp.
-    cached_data_content = read_json_from_file(cached_data_filepath)
+    #Not performing too many updates is done by checking the menus_last_updated_at key. It is saved as a unix timestamp.
+    status_content = read_json_from_file(status_data_filepath)
     logger.info("Cached data file loaded.")
     logger.info("Checking if an update should be done...")
     update_every_minutes = int(downloader_settings["allow_download_every_minutes"])
-    menu_last_updated_at = cached_data_content["menu_last_updated_at"]
-    if menu_last_updated_at != None:
+    menu_last_updated_at = status_content["menus_last_updated_at"]
+    if menu_last_updated_at is not None:
         seconds_since_last_download = time.time() - menu_last_updated_at #Get the amount of seconds since last download
         minutes_since_last_download = seconds_since_last_download / 60 #Calculate the amount of minutes elapsed since the last download
         logger.info(f"Minutes elapsed since last download: {minutes_since_last_download} minutes.")
@@ -100,8 +101,7 @@ logger.info("JSON data is valid. Loading menus...")
 #Iterate through each menu to load and grab its data
 for menu_name in menus_to_load:
     if not menu_name.startswith("/"): #Menu paths begin with a forward slash (for example /kista-nod). Therefore, document and add it in case someone forgot to do it :)
-        logger.warning(f"Automatically adding a slash (/) in front of the menu path \"{menu_name}\". To supress this warning, change your configuration file from {menu_name} to /{menu_name}.")
-        menu_name = f"/{menu_name}"
+        logger.warning(f"Desiring a slash (/) in front of the menu path \"{menu_name}\". To supress this warning, change your configuration file from {menu_name} to /{menu_name}.")
     #Get the latest menu from the list of Eateries, This extra step has been added if Eatery changes their menu ID
     if menu_name in eatery_eateries_request_json and "lunchmeny" in eatery_eateries_request_json[menu_name]["menues"]: #Check that menu is available and that a lunch menu is available from it
         menu_id = eatery_eateries_request_json[menu_name]["menues"]["lunchmeny"]
@@ -112,15 +112,16 @@ for menu_name in menus_to_load:
             menu_output = menu_parser.parse(eatery_menues_request_json[str(menu_id)])
             logger.info(f"Got output {menu_output} for menu ID {menu_id}.")
             #Add the menu data to the cached data content
-            cached_data_content["cached_menus"][str(menu_name)] = {"menu": menu_output, "menu_id": menu_id, "last_retrieved_at": datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()}
-            logger.debug("Cached menu content was added in memory.")
+            menu_data = {"menu": menu_output, "menu_id": menu_id, "last_retrieved_at": get_now().timestamp()}
+            menu_caching.save_cached_menu(menu_name.strip("/"), menu_data)
+            logger.debug("Cached menu content was saved.")
         else: #If the content for the menu ID is not available
             logger.warning(f"Menu {menu_id} is not available from Eatery! It will not be included in the current save.")
     else:
         logger.warning(f"Menu for {menu_name} is not available from Eatery! It will not be included in the current save.")
 
 logger.info("Menu iteration completed. Adding last updated date and saving to file...")
-cached_data_content["menu_last_updated_at"] = datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()
+status_content["menu_last_updated_at"] = datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).timestamp()
 #Save the menu to the file
-write_json_to_file(cached_data_content, cached_data_filepath)
+write_json_to_file(status_content, status_data_filepath)
 logger.info("Data updated to file. All done!")

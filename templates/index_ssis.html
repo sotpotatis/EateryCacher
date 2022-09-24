@@ -8,120 +8,272 @@ which is the lunch API for Stockholm Science & Innovation School.
     <meta charset="UTF-8">
     <title>Eatery Menu API</title>
     <!-- Meta tags -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta name="description" content="An API for interacting with Eatery lunch menus."/>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/logos/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/logos/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/logos/favicon-16x16.png">
+    <link rel="manifest" href="/static/logos/site.webmanifest">
+    <link rel="mask-icon" href="/static/logos/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="shortcut icon" href="/static/logos/favicon.ico">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-config" content="/static/logos/browserconfig.xml">
+    <meta name="theme-color" content="#ffffff">
     <!-- Tailwind -->
     <link rel="stylesheet" href="/static/css/output.css">
     <!-- Iconify -->
     <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+    <!-- CodeMirror -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"
+            integrity="sha512-8RnEqURPUc5aqFEN04aQEiPlSAdE0jlFS/9iGgUyNtwFnSKCXhmB6ZTNl7LnDtDWKabJIASzXrzD0K+LYexU9g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css"
+          integrity="sha512-uf06llspW44/LZpHzHT6qBOIVODjWtv4MxCricRxkzvopAlSWnTf6hpZTFxuuZcuNE9CBQhqE0Seu1CoRk84nQ=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/nord.min.css"
+          integrity="sha512-sPc4jmw78pt6HyMiyrEt3QgURcNRk091l3dZ9M309x4wM2QwnCI7bUtsLnnWXqwBMECE5YZTqV6qCDwmC2FMVA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"
+            integrity="sha512-I6CdJdruzGtvDyvdO4YsiAq+pkWf2efgd1ZUSK2FnM/u2VuRASPC7GowWQrWyjxCZn6CT89s3ddGI+be0Ak9Fg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/foldcode.min.js"
+            integrity="sha512-Q2qfEJEU257Qlqc4/5g6iKuJNnn5L0xu2D48p8WHe9YC/kLj2UfkdGD01qfxWk+XIcHsZngcA8WuKcizF8MAHA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/addon/fold/brace-fold.min.js"
+            integrity="sha512-5MuaB1PVXvhsYVG0Ozb0bwauN7/D1VU4P8dwo5E/xiB9SXY+VSEhIyxt1ggYk2xaB/RKqKL7rPXpm1o1IlTQDA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body class="bg-cyan-900 min-h-screen p-5 flex flex-col text-white justify-center align-center place-items-center">
 <div class="w-3/4 flex-col space-y-3">
-<h1 class="text-[1200%] font-bold"><span class="iconify" data-icon="emojione-monotone:fork-and-knife-with-plate"></span></h1>
-<h1 class="text-5xl font-bold">Eatery Lunch API</h1>
-<p class="text-xl">Ett API för att hämta den aktuella lunchmenyn på SSIS.</p>
-<div id="warning" class="bg-cyan-600 rounded-lg border-2 border-white p-3">
-    <h3 class="text-lg font-bold">Notera:</h3>
-    <p>Vänligen notera att detta är ett helt inofficiellt API och drivs inte av Eatery eller någon som är associerad med de.
-    {# Provide host email address if set in the configuration #}
-    {% if host_email_address is not none %}
-    Om du arbetar på Eatery och inte tycker om att denna hemsida körs, vänligen kontakta <a href="mailto:{{host_email_address}}" class="underline hover:cursor-pointer">hemsidesadministratören</a>.
-    {% endif %}
-    </p>
-</div>
+    <h1 class="text-[1200%] font-bold"><span class="iconify"
+                                             data-icon="emojione-monotone:fork-and-knife-with-plate"></span></h1>
+    <h1 class="text-5xl font-bold">Eatery Lunch API</h1>
+    <p class="text-xl">Ett API för att hämta den aktuella lunchmenyn på SSIS.</p>
+    <div id="warning" class="bg-cyan-600 rounded-lg border-2 border-white p-3">
+        <h3 class="text-lg font-bold">Notera:</h3>
+        <p>Vänligen notera att detta är ett helt inofficiellt API och drivs inte av Eatery eller någon som är associerad
+            med de.
+            {# Provide host email address if set in the configuration #}
+            {% if host_email_address is not none %}
+            Om du arbetar på Eatery och inte tycker om att denna hemsida körs, vänligen kontakta <a
+                    href="mailto:{{host_email_address}}"
+                    class="underline hover:cursor-pointer">hemsidesadministratören</a>.
+            {% endif %}
+        </p>
+    </div>
     {% if statistics_data is not none %}
     <h3 class="text-2xl font-bold">Statistik</h3>
-    <p><ul class="list-disc">
-    <li><b>Förfrågningar senaste dagen:</b> {{ statistics_data.requests.daily.count }} st</li>
-    <li><b>Förfrågningar denna vecka:</b> {{ statistics_data.requests.weekly.count }} st</li>
-    <li><b>Förfrågningar denna månad:</b> {{ statistics_data.requests.monthly.count }} st</li>
-    <li><b>Totalt:</b> {{ statistics_data.requests.all_time.count }} st</li>
-    </ul></p>
+    <p>
+    <ul class="list-disc">
+        <li><b>Förfrågningar senaste dagen:</b> {{ statistics_data.requests.daily.count }} st</li>
+        <li><b>Förfrågningar denna vecka:</b> {{ statistics_data.requests.weekly.count }} st</li>
+        <li><b>Förfrågningar denna månad:</b> {{ statistics_data.requests.monthly.count }} st</li>
+        <li><b>Totalt:</b> {{ statistics_data.requests.all_time.count }} st</li>
+    </ul>
+    </p>
     {% endif %}
-<h3 class="text-2xl font-bold">Hur du interagerar med API:et</h3>
-<h3 class="text-xl font-bold">Endpoints</h3>
-<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/</span> Hämta aktuell lunchmeny</p>
-<p>Denna endpoint hämtar den aktuella lunchmenyn för den nuvarande veckan (i svensk tidszon). Det är det enklaste och smidigaste sättet att hämta den aktuella menyn.</p>
-<p class="text-xl font-semibold"><span class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/{menu_id}/{week_number}</span> Get a menu for a requested week</p>
+    <h3 class="text-2xl font-bold">Hur du interagerar med API:et</h3>
+    <h3 class="text-xl font-bold">Endpoints</h3>
+    <p class="text-xl font-semibold"><span
+            class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span
+            class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/</span> Hämta
+        aktuell lunchmeny</p>
+    <p>Denna endpoint hämtar den aktuella lunchmenyn för Eatery Kista Nod för den nuvarande veckan (i svensk tidszon).
+        Det är det enklaste och smidigaste sättet att hämta den aktuella menyn.</p>
+    <p class="text-xl font-semibold"><span
+            class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span
+            class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/{menu_id}/{week_number}</span>
+        Hämta meny för en efterfrågad vecka</p>
     <p>Denna endpoint fungerar som <a>Hämta aktuell lunchmeny</a>-endpointen, men tillåter lite mer anpassning.</p>
-<p class="font-bold">Parameter: menu_id</p>
-    Eatery-restaurangen som menyn ska hämtas för. All Eaterys restaurang-ID:n kan hittas <a class="underline hover:cursor:pointer" href="" target="_blank">här</a> (ID:na är toppnivånycklarna i JSON-svaret, till exempel "kista_nod").
+    <p class="font-bold">Parameter: menu_id</p>
+    Eatery-restaurangen som menyn ska hämtas för. All Eaterys restaurang-ID:n kan hittas <a
+        class="underline hover:cursor:pointer" href="" target="_blank">här</a> (ID:na är toppnivånycklarna i
+    JSON-svaret, till exempel "kista_nod").
     Notera dock att <b>endast</b> följande menyer sparas på servern:
     <ul class="list-disc">
-    {%- for menu_id in saved_menus_list %}
+        {%- for menu_id in saved_menus_list %}
         <li>{{ menu_id }}</li>
-    {% endfor -%}
+        {% endfor -%}
     </ul>
     <span>Notera att denna parameter endast har ett möjligt värde då den endast sparar menyn på Eatery Kista Nod!</span>
     <div class="bg-cyan-600 p-3 rounded-lg border-2 border-white">
         <h5 class="font-bold">Notera:</h5>
-        <p>31 maj 2022 (i källkoden), 19 september 2022 på det publika API:et så ändrades formatet för meny-ID:t för att primärt acceptera ett textbaserat ID som t.ex. "kista_nod". Detta på grund av att Eatery tenderar att ändra sitt meny-ID lite då och då,
-           och genom att istället ha ID:t på detta sätt så kan API:et gå runt det problemet.
-        <br>
-            Du kan fortfarande använda meny-ID:t (till exempel 2401) för att komma åt menyer, men det rekommenderas inte ifall Eatery ändrar det. (så inga uppdateringar till dina skript om du inte orkar just nu, woo!)
+        <p>31 maj 2022 (i källkoden), 19 september 2022 på det publika API:et så ändrades formatet för meny-ID:t för att
+            primärt acceptera ett textbaserat ID som t.ex. "kista_nod". Detta på grund av att Eatery tenderar att ändra
+            sitt meny-ID lite då och då,
+            och genom att istället ha ID:t på detta sätt så kan API:et gå runt det problemet.
+            <br>
+            Du kan fortfarande använda meny-ID:t (till exempel 2401) för att komma åt menyer, men det rekommenderas inte
+            ifall Eatery ändrar det. (så inga uppdateringar till dina skript om du inte orkar just nu, woo!)
         </p>
     </div>
-<p class="font-bold">Parameter: week_number</p>
-<p>Veckonumret som du vill hämta menyn för.</p>
-<h3 class="text-xl font-bold">Förväntade svar</h3>
-<p>Om den efterfrågade menyn finns på servern så borde du få ett svar i stil med detta:</p>
-<div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
-    <p>{
-    "menu": {
-    "title": "Lunchmeny Eatery Kista Nod v. 22",
-    "week_number": 22,
+    <div class="bg-green-500 p-3 rounded-lg border-2 border-white">
+        <h5 class="font-bold">Nyheter!</h5>
+        <p>Från och med 21 september 2022 så sparas/"cachas" tidigare veckans menyer på servern.
+            Detta innebär att du kan använda denna endpoint till att hämta tidigare menyer. Skulle en meny ändras
+            under veckan så sparas även den tidigare menyn (innan ändringen) och görs tillgänglig under
+            "previous_revisions" i API-svaret.</p>
+    </div>
+    <p class="font-bold">Parameter: week_number</p>
+    <p>Veckonumret som du vill hämta menyn för.</p>
+    <p class="text-xl font-semibold"><span
+            class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span
+            class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/{menu_id}/{week_number}/{day_number}</span>
+        Hämta meny för en specifik dag</p>
+    <p>Denna endpoint kan användas för att hämta en meny för en specifik dag. Man får direkt upp menyn för just denna
+        dag.</p>
+    <p class="font-bold">Parameter: menu_id</p>
+    <p>Eatery-restaurangen som menyn ska hämtas för. Se ovan för mer information samt en lista över giltiga
+        parametrar.</p>
+    <p class="font-bold">Parameter: week_number</p>
+    <p>Veckonumret som menyn ska hämtas för.</p>
+    <p class="font-bold">Parameter: day_number</p>
+    <p>Numret på den dag du vill hämta menyn för (måndag-söndag). Spannet på detta nummer är 1-7. <i>Notera att Eatery
+        inte brukar servera mat under lördagar eller söndagar och därför kommer menyn oftast vara otillgänglig då!</i>
+    </p>
+    <p class="text-xl font-semibold"><span
+            class="bg-green-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-white font-bold">GET</span><span
+            class="bg-gray-400 rounded-lg pl-3 pr-3 pt-1 pb-1 mr-3 text-black font-mono font-bold">/api/available_menus</span>
+        Hämta tillgängliga menyer</p>
+    <p>Hämtar en lista över alla menyer som finns tillgängliga och sparade på servern. Genom att använda de endpoints
+        där man kan ange veckonumret kan man hämta de tidigare menyer som nämns här.</p>
+    <h3 class="text-xl font-bold">Förväntade svar</h3>
+    <p class="font-bold">För menyrelaterade endpoints</p>
+    <p>Om den efterfrågade menyn finns på servern så borde du få ett svar i stil med detta:</p>
+    <textarea id="menu-response">{
+  "menu": {
+    "title": "Lunch v.38 Eatery Kista Nod",
+    "week_number": 38,
     "days": {
-    "monday": {
-    "day_name": {
-    "swedish": "Måndag",
-    "english": "Monday"
+      "monday": {
+        "day_name": {
+          "swedish": "Måndag",
+          "english": "Monday"
+        },
+        "dishes": [
+          "Köttbullar med kokt potatis, brunsås , lingon & pressgurka",
+          "Panerad fisk med remouladsås & kokt potatis",
+          "Piccata på kålrot med tomatsås & ris"
+        ],
+        "special_features": {
+          "sweet_tuesday": false,
+          "fruity_wednesday": false,
+          "pancake_thursday": false,
+          "burger_friday": false
+        }
+      },
+      "tuesday": {
+        "day_name": {
+          "swedish": "Tisdag",
+          "english": "Tuesday"
+        },
+        "dishes": [
+          "Ugnsbakad falukorv med potatismos & senap",
+          "Räkgryta Indienne med kokosgrädde & ris",
+          "Tagine gryta med ris (kikärtor, russin, saffran mm)",
+          "Sweet Tuesday: Vi bjuder på något sött till maten"
+        ],
+        "special_features": {
+          "sweet_tuesday": true,
+          "fruity_wednesday": false,
+          "pancake_thursday": false,
+          "burger_friday": false
+        }
+      },
+      "wednesday": {
+        "day_name": {
+          "swedish": "Onsdag",
+          "english": "Wednesday"
+        },
+        "dishes": [
+          "Kalops med rödbetor & kokt potatis",
+          "Lax i krämig gräddsås med spenat & cocktailtomat serveras med ris.",
+          "Pasta Marinara med hembakat vitlöksbröd"
+        ],
+        "special_features": {
+          "sweet_tuesday": false,
+          "fruity_wednesday": false,
+          "pancake_thursday": false,
+          "burger_friday": false
+        }
+      },
+      "thursday": {
+        "day_name": {
+          "swedish": "Torsdag",
+          "english": "Thursday"
+        },
+        "dishes": [
+          "Kycklingnuggets med ris & citronmajonnässås",
+          "Jambalaja med räkor, ris & aioli",
+          "Krämig linssoppa med kokosgrädde & fake bacon",
+          "Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
+        ],
+        "special_features": {
+          "sweet_tuesday": false,
+          "fruity_wednesday": false,
+          "pancake_thursday": true,
+          "burger_friday": false
+        }
+      },
+      "friday": {
+        "day_name": {
+          "swedish": "Fredag",
+          "english": "Friday"
+        },
+        "dishes": [
+          "Hamburgare med tillbehör serveras med ugnsrostad potatis",
+          "Fiskgratäng med champinjonsås & kokt potatis",
+          "Vegoburgare med  tillbehör serveras med ugnsrostad potatis"
+        ],
+        "special_features": {
+          "sweet_tuesday": false,
+          "fruity_wednesday": false,
+          "pancake_thursday": false,
+          "burger_friday": false
+        }
+      }
     },
-    "dishes": [
-    "Fläskkarré med bearnaisesås och råstekt potatis",
-    "Panerad spättafilé med citronmajonnäs och ris",
-    "Fried rice med oumph"
-    ],
-    "special_features": {
-    "sweet_tuesday": false,
-    "fruity_wednesday": false,
-    "pancake_thursday": false,
-    "burger_friday": false
+    "footer": "Allergisk? Fråga oss!"
+  },
+  "menu_id": 521,
+  "last_retrieved_at": 1663955103.240052,
+  "status": "success",
+  "status_code": 200
+}</textarea>
+    <p>Om den efterfrågade menyn inte finns på servern så kommer du att få ett 404 Not Found-svar som säger vad som är
+        fel.</p>
+    <p class="font-bold">För listan av menyer</p>
+    <textarea id="menu-list-response">{
+  "available_menus": {
+    "kista-nod": {
+      "available_weeks": [
+        38
+      ]
     }
-    },
-    "tuesday": {
-    ...
-    },
-    "wednesday": {
-    ...
-    },
-    "thursday": {
-    ...
-    },
-    "friday": {
-    ...
-    },
-    "footer": "Allergi? Fråga oss!\nLunch 107kr. med Eaterykortet (ordinarie pris 119kr.) Serveras mellan 10.30 och 14.00\nBröd, sallad, mineralvatten och kaffe/te ingår"
-    },
-    "last_retrieved_at": 1654016402.921905,
-    "status": "success",
-    "menu_id": 521,
-    "status_code": 200
-    }<p>
-</div>
-    <p>Om den efterfrågade menyn inte finns på servern så kommer du att få ett 404 Not Found-svar.</p>
+  },
+  "status": "success",
+  "status_code": 200
+}</textarea>
     <p>Om parametrar till API:et är ogiltiga så kommer du få ett 400 Bad Request-svar.</p>
     <p>Alla andra statuskoder är oväntade och kan indikera ett möjligt fel på servern.</p>
-    <p>För de felmeddelanden som är korrekt hanterade av servern så kommer du att få ett JSON-svar som berättar mer om vad som gick fel:</p>
-    <div class="bg-gray-200 text-black p-3 rounded-lg border-2 border-black">
-        {
-        "message": "Menu ID not available.",
-        "status": "error",
-        "status_code": 404
-        }
-    </div>
+    <p>För de felmeddelanden som är korrekt hanterade av servern så kommer du att få ett JSON-svar som berättar mer om
+        vad som gick fel:</p>
+    <textarea id="error-response">{
+  "message": "Menu is not available.",
+  "status": "error",
+  "status_code": 404
+        }</textarea>
     <hr class="w-full">
-    <p class="flex flex-row gap-3"><a href="https://github.com/sotpotatis/EateryCacher" class="underline hover:cursor-pointer" target="_blank"><span class="iconify" data-icon="akar-icons:github-fill"></span></a>
-        {% if host_email_address is not none %}<a href="mailto:{{ host_email_address }}" class="underline hover:cursor-pointer" target="_blank"><span class="iconify" data-icon="entypo:mail"></span></a></p>{% endif %}
-    </div>
+    <p class="flex flex-row gap-3"><a href="https://github.com/sotpotatis/EateryCacher"
+                                      class="underline hover:cursor-pointer" target="_blank"><span class="iconify"
+                                                                                                   data-icon="akar-icons:github-fill"></span></a>
+        {% if host_email_address is not none %}<a href="mailto:{{ host_email_address }}"
+                                                  class="underline hover:cursor-pointer" target="_blank"><span
+                class="iconify" data-icon="entypo:mail"></span></a></p>{% endif %}
+</div>
+<!-- Code editors -->
+<script src="/static/js/editors.js"></script>
 </body>
 </html>
