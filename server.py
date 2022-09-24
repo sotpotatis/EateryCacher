@@ -251,3 +251,23 @@ def not_found_error_handler(e):
     response = generate_api_error_response(error_message, 404)
     logger.info("Returning error response to user...")
     return jsonify(response), 404
+
+@app.app_errorhandler(Exception)
+def error_handler(e):
+    '''Handles 500 errors.'''
+    if isinstance(e, HTTPException):
+        logger.info("Ignored HTTP exception.")
+        return e
+    logger.critical(f"Handling an internal server error: {e}.", exc_info=True)
+    # Try to pretty-print the exception
+    try:
+        traceback.print_exc()
+    except:
+        logger.info("Detailed logging information is not available.")
+    error_message = "Sorry, an unexpected internal server occurred. Retry the request or try again later."
+    # Add extra information in case index file (with documentation) is enabled.
+    if SHOW_INDEX_FILE:
+        error_message += " If the error persists, try contacting the API maintainer. There might be contact information on the index page of this website."
+    response = generate_api_error_response(error_message, 500)
+    logger.info("Returning error response to user...")
+    return jsonify(response), 500
