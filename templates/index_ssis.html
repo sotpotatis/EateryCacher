@@ -116,6 +116,13 @@ which is the lunch API for Stockholm Science & Innovation School.
             under veckan så sparas även den tidigare menyn (innan ändringen) och görs tillgänglig under
             "previous_revisions" i API-svaret.</p>
     </div>
+    <div class="bg-gray-500 p-3 rounded-lg border-2 border-white">
+        <h5 class="font-bold">Tidigare år</h5>
+        <p>För att arbeta med data från tidigare år kan du lägga till ?year= som en URL-parameter på slutet
+        av din förfrågning. Som standard kommer endast data från det aktuella året att returneras, även
+        när du listar menyer. Denna parameter finns tillgängliga på samtliga endpoints förutom den helautomatiska
+        (/api) från och med 13 januari 2023.</p>
+    </div>
     <p class="font-bold">Parameter: week_number</p>
     <p>Veckonumret som du vill hämta menyn för.</p>
     <p class="text-xl font-semibold"><span
@@ -128,9 +135,10 @@ which is the lunch API for Stockholm Science & Innovation School.
     <p>Eatery-restaurangen som menyn ska hämtas för. Se ovan för mer information samt en lista över giltiga
         parametrar.</p>
     <p class="font-bold">Parameter: week_number</p>
-    <p>Veckonumret som menyn ska hämtas för.</p>
+    <p>Veckonumret som menyn ska hämtas för. <i>Nyhet 13 januari 2023:</i> Skriv "now" for att få den aktuella veckan.</p>
     <p class="font-bold">Parameter: day_number</p>
-    <p>Numret på den dag du vill hämta menyn för (måndag-söndag). Spannet på detta nummer är 1-7. <i>Notera att Eatery
+    <p>Numret på den dag du vill hämta menyn för (måndag-söndag). Spannet på detta nummer är 1-7. <i>Nyhet 13 januari 2023:</i> Skriv "today" for att få den aktuella dagen.
+        <i>Notera att Eatery
         inte brukar servera mat under lördagar eller söndagar och därför kommer menyn oftast vara otillgänglig då!</i>
     </p>
     <p class="text-xl font-semibold"><span
@@ -253,6 +261,7 @@ which is the lunch API for Stockholm Science & Innovation School.
       ]
     }
   },
+  "year": 2023,
   "status": "success",
   "status_code": 200
 }</textarea>

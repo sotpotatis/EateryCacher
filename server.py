@@ -6,9 +6,9 @@ import logging, datetime, pytz, os, json, menu_caching
 import traceback
 
 import werkzeug.exceptions
-from flask import Blueprint, jsonify, send_from_directory, render_template
+from flask import Blueprint, jsonify, send_from_directory, render_template, request
 from werkzeug.exceptions import HTTPException
-from shared_code import EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH, statistics_data_file_path, write_json_to_file, read_json_from_file, get_now, CACHED_MENUS_DIRECTORY
+from shared_code import EATERY_KISTA_NOD_MENU_ID, CONFIG_FILEPATH, statistics_data_file_path, write_json_to_file, read_json_from_file, get_now, CACHED_MENUS_DIRECTORY, validate_integer
 from menuparser import day_names_to_json_keys
 from http import HTTPStatus
 from configparser import ConfigParser
@@ -86,20 +86,22 @@ def generate_api_error_response(error_message, status_code):
     :param status_code: The status code to return.'''
     return generate_api_response("error", {"message": error_message}, status_code)
 
-def generate_api_response_for(menu_name, week_number, day_number=None):
+def generate_api_response_for(menu_name, week_number, day_number=None, year_number=None):
     '''Generates an API response for a specific menu ID and a
     specific week number.'''
-    logger.info(f"Generating API response for menu id {menu_name}, week day {week_number}...")
+    if year_number is None:
+        year_number = get_now().year
+    logger.info(f"Generating API response for menu id {menu_name}, week number {week_number}, day name {day_number}, year number {year_number}...")
     #Detect - string or integer
     is_digit = menu_name.isdigit()
     if not is_digit and not menu_name.startswith("/"): #This is done to match the format of the configuration files. It's not smart to have slashes to fill out the ID in a URL :)
         menu_name = f"/{menu_name}"
     #Retrieve menu
-    requested_menu = menu_caching.get_cached_menu(menu_name, week_number)
+    requested_menu = menu_caching.get_cached_menu(menu_name, week_number, year_number)
     if requested_menu is not None:
         logger.info("Menu is available. Returning response...")
         #If a specific day hasn't been requested...
-        if day_number == None:
+        if day_number is None:
             return generate_api_response("success", requested_menu) #...return the full menu
         else:
             logger.debug("Custom day has been specified! Checking and returning...")
@@ -129,6 +131,7 @@ def generate_api_response_for(menu_name, week_number, day_number=None):
 def timestamp_to_local_time(timestamp_str):
     '''Converts a timestamp from a timestamp string to local Swedish time.'''
     return datetime.datetime.fromisoformat(timestamp_str).astimezone(tz=pytz.timezone("Europe/Stockholm"))
+
 
 def increase_statistics_file_api_count():
     '''There is a statistics file which tracks how often the API has been accessed.
@@ -184,7 +187,8 @@ def api():
     logger.info("Got a request to the general API! Generating response...")
     increase_statistics_file_api_count()
     #Get current week
-    current_week = datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm")).isocalendar()[1]
+    now = get_now()
+    current_week = now.isocalendar()[1]
     logger.info(f"Current week: {current_week}")
     #Generate response
     response = generate_api_response_for(EATERY_KISTA_NOD_MENU_ID, current_week)
@@ -196,24 +200,64 @@ def specific_api(menu_id, week_number):
     '''Specific API. Allows one to specify the menu ID and the week number.'''
     logger.info("Got a request to the specific API! Generating response...")
     increase_statistics_file_api_count()
+    # Validate custom year number if provided
+    year_number = None
+    if "year" in request.args:
+        custom_year = request.args["year"]
+        year_number_valid_int, year_number_int = validate_integer(custom_year)
+        if not year_number_valid_int:
+            logger.info(f"Invalid custom year number ({custom_year}).")
+            return generate_api_error_response("Invalid year number (must be an valid integer)",
+                                               HTTPStatus.BAD_REQUEST), HTTPStatus.BAD_REQUEST
+        logger.debug("Custom year provided. Using...")
+        year_number = year_number_int
     #Generate response
-    response = generate_api_response_for(menu_id, week_number)
+    response = generate_api_response_for(menu_id, week_number, year_number=year_number)
     logger.info(f"Response retrieved: {response}. Returning...")
     return jsonify(response), response["status_code"] #Return the response
 
 
-@app.route("/api/<string:menu_id>/<int:week_number>/<int:day_number>")
+@app.route("/api/<string:menu_id>/<string:week_number>/<string:day_number>/")
 def specific_day_api(menu_id, week_number, day_number):
     '''Specific day API. Allows one to specify the menu ID, the week number, and the day ID to retrieve.'''
     logger.info("Got a request to the specific day API! Generating response...")
     increase_statistics_file_api_count()
-    #Validate the day ID
-    if day_number < 1 or day_number > 7:
+    now = get_now()
+    # Check for a custom year
+    # Validate custom year number if provided
+    year_number = None
+    if "year" in request.args:
+        custom_year = request.args["year"]
+        year_number_valid_int, year_number_int = validate_integer(custom_year)
+        if not year_number_valid_int:
+            logger.info(f"Invalid custom year number ({custom_year}).")
+            return generate_api_error_response("Invalid year number (must be an valid integer)",
+                                               HTTPStatus.BAD_REQUEST), HTTPStatus.BAD_REQUEST
+        logger.debug("Custom year provided. Using...")
+        year_number = year_number_int
+    #Validate the week number
+    week_number_valid_int, week_number_int = validate_integer(week_number)
+    if week_number == "now": # Special feature: pass "now" to get the current week
+        logger.debug("Applying week number for today...")
+        week_number = now.isocalendar()[1]
+    elif not week_number_valid_int or week_number_int < 1 or week_number_int > 53:
+        logger.info(f"Invalid week number sent ({week_number}). Returning error...")
+        return generate_api_error_response("Invalid week number (must be 1-7)", HTTPStatus.BAD_REQUEST), HTTPStatus.BAD_REQUEST
+    else:
+        week_number = week_number_int
+    #Validate the day number
+    day_number_valid_int, day_number_int = validate_integer(day_number)
+    if day_number == "today": # Special feature: pass "today" to get the current day
+        logger.debug("Applying day for today...")
+        day_number = now.isoweekday()
+    elif not day_number_valid_int or day_number_int < 1 or day_number_int > 7:
         logger.info(f"Invalid day number sent ({day_number}). Returning error...")
         return generate_api_error_response("Invalid day number (must be 1-7)", HTTPStatus.BAD_REQUEST), HTTPStatus.BAD_REQUEST
+    else:
+        day_number = day_number_int
     logger.debug("Day number is valid. Generating response...")
     #Generate response
-    response = generate_api_response_for(menu_id, week_number, day_number)
+    response = generate_api_response_for(menu_id, week_number, day_number, year_number)
     logger.info(f"Response retrieved: {response}. Returning...")
     return jsonify(response), response["status_code"] #Return the response
 
@@ -222,12 +266,27 @@ def available_menus_api():
     '''Available menus API. Returns the available menus and their saved weeks.'''
     logger.info("Got a request to the available menus API. Generating response...")
     menus_data = {"available_menus": {}}
+    year_number = get_now().year
+    # Validate custom year number if provided
+    if "year" in request.args:
+        custom_year = request.args["year"]
+        year_number_valid_int, year_number_int = validate_integer(custom_year)
+        if not year_number_valid_int:
+            logger.info(f"Invalid custom year number ({custom_year}).")
+            return generate_api_error_response("Invalid year number (must be an valid integer)",
+                                               HTTPStatus.BAD_REQUEST), HTTPStatus.BAD_REQUEST
+        logger.debug("Custom year provided. Using...")
+        year_number = year_number_int
+    menus_data["year"] = year_number
     for menu_id in os.listdir(CACHED_MENUS_DIRECTORY):  # For all menus
         menu_path = os.path.join(CACHED_MENUS_DIRECTORY, menu_id)
         available_weeks = []
-        for week in os.listdir(menu_path):  # For all cached weeks in each menu
+        for cached_week in os.listdir(menu_path):  # For all cached weeks in each menu
+            week, year = cached_week.split("-")
             week_number = int(week)
-            week_path = menu_caching.get_cached_menu_directory(menu_id, week_number)
+            if not year == str(year_number):
+                continue
+            week_path = menu_caching.get_cached_menu_directory(menu_id, week_number, year_number)
             # Validate that menu data file exists
             menu_data_file = os.path.join(week_path, "data.json")
             if os.path.exists(menu_data_file):

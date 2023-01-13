@@ -54,7 +54,7 @@ def create_app():
 
 
 app = create_app()
-if run_server == True:
+if run_server is True:
     logger.info("Server should be ran. Running...")
     logger.warning("""WARNING!
     You are running the Flask default server. Only do this in a development

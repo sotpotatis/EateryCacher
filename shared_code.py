@@ -4,6 +4,7 @@ Some shared code and constants between the server and the retriever.
 
 '''
 import os, logging, json, datetime, pytz
+from typing import Optional, Tuple
 
 #Set up logging by creating a logger
 logger = logging.getLogger(__name__)
@@ -40,3 +41,15 @@ def write_json_to_file(data_to_write:dict, file_path:str)->None:
 def get_now()->datetime.datetime:
     '''Retrieves the current time in Stockholm, Sweden timezone.'''
     return datetime.datetime.now(tz=pytz.timezone("Europe/Stockholm"))
+
+def validate_integer(input_integer:str)->Tuple[bool, Optional[int]]:
+    '''Validates that an integer is valid.
+
+    :param input_integer: The input.
+
+    :returns A tuple of True if the integer is valid, False if it is not and
+    the converted integer (if any, otherwise None).'''
+    try:
+        return True, int(input_integer)
+    except:
+        return False, None

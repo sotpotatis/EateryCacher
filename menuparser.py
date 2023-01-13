@@ -25,7 +25,7 @@ known_footer_phrases = [
     re.compile("(.*)Eaterykortet*(.*)"), #Alternativt regex: (((L|l)unch){0,} *[0-9]{0,} *kr *)(med *){0,}Eaterykortet(.*) (mindre kompakt)
     re.compile("(.*)ingår(.*)")
 ] #Known phrases that are in the bottom of the Eatery menu
-week_menu_title_regex = re.compile("(.*)([0-9]{2})(.*)") #Regex for getting the week number from a title.
+week_menu_title_regex = re.compile("(.*)([0-9]{1,2})(.*)") #Regex for getting the week number from a title.
 #Logging
 logger = logging.getLogger(__name__)
 class MenuParser:
