@@ -1,5 +1,5 @@
 beautifulsoup4>=4.11.1
-fake_useragent>=1.1.1
+fake-useragent>=1.1.1
 Flask>=2.1.2
 Flask_Cors>=3.0.10
 python_dateutil>=2.8.2
