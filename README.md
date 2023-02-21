@@ -63,3 +63,7 @@ can run the following command to rebuild the CSS:
 ### Configuring
 
 See the file `config.ini.example` for configuration of the EateryCacher. You can copy it to `config.ini` and change the parameters.
+
+### Development
+
+This project uses [pre-commit](https://pre-commit.com/) to automatically format files using the [black code formatter](https://black.readthedocs.io/en/stable/). You will therefore have to run `pre-commit install` to get it to work.

@@ -1,8 +1,14 @@
-'''menu_caching.py
-Contains helper functions related to caching menus.'''
+"""menu_caching.py
+Contains helper functions related to caching menus."""
 import os, logging, typing, re, shutil
 
-from shared_code import write_json_to_file, read_json_from_file, get_now, CACHED_MENUS_DIRECTORY
+from shared_code import (
+    write_json_to_file,
+    read_json_from_file,
+    get_now,
+    CACHED_MENUS_DIRECTORY,
+)
+
 logger = logging.getLogger(__name__)
 
 if not os.path.exists(CACHED_MENUS_DIRECTORY):
@@ -17,29 +23,42 @@ else:
     for menu_id in os.listdir(CACHED_MENUS_DIRECTORY):
         menu_path = os.path.join(CACHED_MENUS_DIRECTORY, menu_id)
         for content in os.listdir(menu_path):
-            full_directory_path = os.path.join(CACHED_MENUS_DIRECTORY, menu_path, content)
+            full_directory_path = os.path.join(
+                CACHED_MENUS_DIRECTORY, menu_path, content
+            )
             if os.path.isdir(full_directory_path):
                 if re.fullmatch("^[0-9]{1,2}$", content):
                     if get_now().year == 2023:
-                        logger.info(f"Applying auto migration to directory {full_directory_path}...")
-                        new_directory_name = f"{content}-2022" # Add year to the directory name
+                        logger.info(
+                            f"Applying auto migration to directory {full_directory_path}..."
+                        )
+                        new_directory_name = (
+                            f"{content}-2022"  # Add year to the directory name
+                        )
                     else:
-                        logger.warning(f"""Due to a format change in early 2023 to separate menus by years, some 
+                        logger.warning(
+                            f"""Due to a format change in early 2023 to separate menus by years, some 
                         old menus have to be moved to a new directory.
                         This migration will be automatically applied, however, you have to provide which year the following
-                        menu: {full_directory_path} was downloaded at?""")
+                        menu: {full_directory_path} was downloaded at?"""
+                        )
                         while True:
                             try:
-                                year = int(input('Enter year: '))
+                                year = int(input("Enter year: "))
                                 new_directory_name = f"{content}-{year}"
                             except:
                                 logger.warning("Invalid year. Please try again.")
-                    new_directory_path = os.path.join(CACHED_MENUS_DIRECTORY, menu_path, new_directory_name)
-                    logger.info(f"Auto-migration: move {full_directory_path} to {new_directory_path}")
+                    new_directory_path = os.path.join(
+                        CACHED_MENUS_DIRECTORY, menu_path, new_directory_name
+                    )
+                    logger.info(
+                        f"Auto-migration: move {full_directory_path} to {new_directory_path}"
+                    )
                     shutil.move(full_directory_path, new_directory_path)
         logger.info("Check for auto-migrations completed.")
 
-def get_cached_menu_directory(menu_id:str, week:int, year:int)->str:
+
+def get_cached_menu_directory(menu_id: str, week: int, year: int) -> str:
     """Gets the directory for a certain menu. Menues are
     stored in the cached directory under their menu ID
     and then their week.
@@ -49,11 +68,13 @@ def get_cached_menu_directory(menu_id:str, week:int, year:int)->str:
     :param week: The week number for the menu.
 
     :param year: The menu's year."""
-    menu_id = menu_id.strip("/") # Strip / from menu IDs like "/kista_nod" to avoid paths getting messed up
+    menu_id = menu_id.strip(
+        "/"
+    )  # Strip / from menu IDs like "/kista_nod" to avoid paths getting messed up
     return os.path.join(CACHED_MENUS_DIRECTORY, f"{menu_id}/{week}-{year}")
 
 
-def save_cached_menu(menu_id:str, data:dict)->None:
+def save_cached_menu(menu_id: str, data: dict) -> None:
     """Saves cached menu data for a week."""
     logger.info(f"Saving menu for {menu_id}...")
     week_number = data["menu"]["week_number"]
@@ -77,10 +98,13 @@ def save_cached_menu(menu_id:str, data:dict)->None:
             logger.info("Got changed menu data. Pushing new menu data...")
             if "previous_revisions" not in menu_data:
                 menu_data["previous_revisions"] = []
-            menu_data["previous_revisions"].append({
-                "revision_number": len(menu_data["previous_revisions"])+1,
-                "change_discovered_at": get_now().timestamp(),
-                "previous_data": menu_data["menu"]})
+            menu_data["previous_revisions"].append(
+                {
+                    "revision_number": len(menu_data["previous_revisions"]) + 1,
+                    "change_discovered_at": get_now().timestamp(),
+                    "previous_data": menu_data["menu"],
+                }
+            )
             logger.info("Added information about differences.")
     else:
         logger.info("Menu data will be new.")
@@ -95,7 +119,9 @@ def save_cached_menu(menu_id:str, data:dict)->None:
     logger.info(f"Menu data written to {menu_data_file_path}.")
 
 
-def get_cached_menu(menu_id:str, week_number:int, year_number:int)->typing.Optional[dict]:
+def get_cached_menu(
+    menu_id: str, week_number: int, year_number: int
+) -> typing.Optional[dict]:
     """Gets the cached menu for a certain ID and week.
 
     :param menu_id: The menu ID to retrieve.
@@ -112,22 +138,28 @@ def get_cached_menu(menu_id:str, week_number:int, year_number:int)->typing.Optio
     # If not, we have to try to find the menu string that belongs to the menu ID.
     menu_id_is_digit = menu_id.isdigit()
     logger.info(f"Getting menu for ID {menu_id}, week {week_number}")
-    if not menu_id_is_digit: # Is string - return menu right away
+    if not menu_id_is_digit:  # Is string - return menu right away
         logger.debug("Is not digit - returning right away if exists.")
         # Validate that files exist and then save them
         if os.path.exists(cached_menu_directory):
             menu_data_file_path = os.path.join(cached_menu_directory, "data.json")
             if os.path.exists(menu_data_file_path):
                 return read_json_from_file(menu_data_file_path)
-    else: # Is digit - iterate over all menus until an appropriate one is found for the week
+    else:  # Is digit - iterate over all menus until an appropriate one is found for the week
         logger.debug("Is digit - iterating over all menus...")
         for menu in os.listdir(CACHED_MENUS_DIRECTORY):
-            if str(week_number) in os.listdir(os.path.join(CACHED_MENUS_DIRECTORY, menu)):
-                menu_data_file_path = os.path.join(f"{CACHED_MENUS_DIRECTORY}/{menu}/{week_number}", "data.json")
+            if str(week_number) in os.listdir(
+                os.path.join(CACHED_MENUS_DIRECTORY, menu)
+            ):
+                menu_data_file_path = os.path.join(
+                    f"{CACHED_MENUS_DIRECTORY}/{menu}/{week_number}", "data.json"
+                )
                 if os.path.exists(menu_data_file_path):
                     menu_content = read_json_from_file(menu_data_file_path)
                     if menu.isdigit() and menu == menu_id:
                         return menu_content
-                    elif "menu_id" in menu_content and menu_content["menu_id"] == int(menu_id):
+                    elif "menu_id" in menu_content and menu_content["menu_id"] == int(
+                        menu_id
+                    ):
                         return menu_content
     return None

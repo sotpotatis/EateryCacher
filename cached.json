@@ -196,8 +196,8 @@
   },
   "/kista-nod": {
    "menu": {
-    "title": "Lunchmeny Eatery Kista Nod v. 22",
-    "week_number": 22,
+    "title": "Lunch v.38 Eatery Kista Nod",
+    "week_number": 38,
     "days": {
      "monday": {
       "day_name": {
@@ -205,9 +205,9 @@
        "english": "Monday"
       },
       "dishes": [
-       "Fl\u00e4skkarr\u00e9 med bearnaises\u00e5s och r\u00e5stekt potatis",
-       "Panerad sp\u00e4ttafil\u00e9 med citronmajonn\u00e4s och ris",
-       "Fried rice med oumph"
+       "K\u00f6ttbullar med kokt potatis, bruns\u00e5s , lingon & pressgurka",
+       "Panerad fisk med remoulads\u00e5s & kokt potatis",
+       "Piccata p\u00e5 k\u00e5lrot med tomats\u00e5s & ris"
       ],
       "special_features": {
        "sweet_tuesday": false,
@@ -222,10 +222,10 @@
        "english": "Tuesday"
       },
       "dishes": [
-       "Sweet Tuesday \u2013\u00a0Vi bjuder p\u00e5 n\u00e5got s\u00f6tt till maten!",
-       "Kalops med inlagda r\u00f6dbetor och kokt potatis",
-       "Siciliansk tonfiskpasta med friterad kapris och cocktailtomater",
-       "Sk\u00e5nsk \u00e4ggakaka med r\u00e5r\u00f6rda lingon"
+       "Ugnsbakad falukorv med potatismos & senap",
+       "R\u00e4kgryta Indienne med kokosgr\u00e4dde & ris",
+       "Tagine gryta med ris (kik\u00e4rtor, russin, saffran mm)",
+       "Sweet Tuesday: Vi bjuder p\u00e5 n\u00e5got s\u00f6tt till maten"
       ],
       "special_features": {
        "sweet_tuesday": true,
@@ -240,9 +240,9 @@
        "english": "Wednesday"
       },
       "dishes": [
-       "Flygande Jakob med ris och jordn\u00f6tter",
-       "Ugnsbakade potatisrutor med cheddarost och cr\u00e8me fraiches och r\u00e4kor",
-       "Egyptisk falafel med tahinis\u00e5s och gr\u00f6nsaker i pitabr\u00f6d"
+       "Kalops med r\u00f6dbetor & kokt potatis",
+       "Lax i kr\u00e4mig gr\u00e4dds\u00e5s med spenat & cocktailtomat serveras med ris.",
+       "Pasta Marinara med hembakat vitl\u00f6ksbr\u00f6d"
       ],
       "special_features": {
        "sweet_tuesday": false,
@@ -257,14 +257,15 @@
        "english": "Thursday"
       },
       "dishes": [
-       "K\u00e5lpudding med lingonsylt, gr\u00e4dds\u00e5s och kokt potatis",
-       "Torskbiffar med dills\u00e5s och rotfruktsstomp",
-       "Panpizza med tomat, mozzarella och f\u00e4rska champinjoner"
+       "Kycklingnuggets med ris & citronmajonn\u00e4ss\u00e5s",
+       "Jambalaja med r\u00e4kor, ris & aioli",
+       "Kr\u00e4mig linssoppa med kokosgr\u00e4dde & fake bacon",
+       "Pancake Thursday: Vi bjuder p\u00e5 pannkakor, l\u00e4ttvispad gr\u00e4dde och hemmagjord sylt!"
       ],
       "special_features": {
        "sweet_tuesday": false,
        "fruity_wednesday": false,
-       "pancake_thursday": false,
+       "pancake_thursday": true,
        "burger_friday": false
       }
      },
@@ -274,9 +275,9 @@
        "english": "Friday"
       },
       "dishes": [
-       "Hamburgare med tillbeh\u00f6r och pommes frites",
-       "Fish & Chips med remulads\u00e5s",
-       "Vegetarisk burgare med tillbeh\u00f6r och pommes frites"
+       "Hamburgare med tillbeh\u00f6r serveras med ugnsrostad potatis",
+       "Fiskgrat\u00e4ng med champinjons\u00e5s & kokt potatis",
+       "Vegoburgare med\u00a0 tillbeh\u00f6r serveras med ugnsrostad potatis"
       ],
       "special_features": {
        "sweet_tuesday": false,
@@ -286,11 +287,11 @@
       }
      }
     },
-    "footer": "Allergi? Fr\u00e5ga oss!\nLunch 107kr. med Eaterykortet (ordinarie pris 119kr.) Serveras mellan 10.30 och 14.00\nBr\u00f6d, sallad, mineralvatten och kaffe/te ing\u00e5r"
+    "footer": "Allergisk? Fr\u00e5ga oss!"
    },
-   "menu_id": 2401,
-   "last_retrieved_at": 1654195583.646315
+   "menu_id": 521,
+   "last_retrieved_at": 1663565158.841287
   }
  },
- "menu_last_updated_at": 1654195583.649322
+ "menu_last_updated_at": 1663565158.842073
 }
