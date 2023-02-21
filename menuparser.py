@@ -60,6 +60,11 @@ class MenuParser:
         # Get the menu string
         menu_string = menu_content["content"]["content"]
         menu_title = menu_content["content"]["title"]
+        menu_url = (
+            "https://eatery.se/" + menu_content["uri"].strip("/")
+            if "uri" in menu_content
+            else None
+        )
         # Extract week from title
         logger.info("Attempting to extract week from menu title...")
         menu_week_match = re.fullmatch(week_menu_title_regex, menu_title)
@@ -85,6 +90,7 @@ class MenuParser:
         menu_metadata = {
             "title": menu_title,
             "week_number": menu_week,
+            "url": menu_url,
         }  # The menu data result
         result = {}
         # Get raw text with help of the wonderful BeautifulSoup
@@ -136,6 +142,7 @@ class MenuParser:
                         any(re.fullmatch(regex, row) for regex in known_footer_phrases)
                         is False
                     ):  # If no known footer phrases has been found
+                        row = row.strip()  # Trim whitespace from row
                         result[current_day]["dishes"].append(
                             row
                         )  # Add the row to the list of dished for the day

@@ -151,104 +151,200 @@ which is the lunch API for Stockholm Science & Innovation School.
     <p class="font-bold">För menyrelaterade endpoints</p>
     <p>Om den efterfrågade menyn finns på servern så borde du få ett svar i stil med detta:</p>
     <textarea id="menu-response">{
-  "menu": {
-    "title": "Lunch v.38 Eatery Kista Nod",
-    "week_number": 38,
-    "days": {
-      "monday": {
-        "day_name": {
-          "swedish": "Måndag",
-          "english": "Monday"
-        },
-        "dishes": [
-          "Köttbullar med kokt potatis, brunsås , lingon & pressgurka",
-          "Panerad fisk med remouladsås & kokt potatis",
-          "Piccata på kålrot med tomatsås & ris"
-        ],
-        "special_features": {
-          "sweet_tuesday": false,
-          "fruity_wednesday": false,
-          "pancake_thursday": false,
-          "burger_friday": false
-        }
-      },
-      "tuesday": {
-        "day_name": {
-          "swedish": "Tisdag",
-          "english": "Tuesday"
-        },
-        "dishes": [
-          "Ugnsbakad falukorv med potatismos & senap",
-          "Räkgryta Indienne med kokosgrädde & ris",
-          "Tagine gryta med ris (kikärtor, russin, saffran mm)",
-          "Sweet Tuesday: Vi bjuder på något sött till maten"
-        ],
-        "special_features": {
-          "sweet_tuesday": true,
-          "fruity_wednesday": false,
-          "pancake_thursday": false,
-          "burger_friday": false
-        }
-      },
-      "wednesday": {
-        "day_name": {
-          "swedish": "Onsdag",
-          "english": "Wednesday"
-        },
-        "dishes": [
-          "Kalops med rödbetor & kokt potatis",
-          "Lax i krämig gräddsås med spenat & cocktailtomat serveras med ris.",
-          "Pasta Marinara med hembakat vitlöksbröd"
-        ],
-        "special_features": {
-          "sweet_tuesday": false,
-          "fruity_wednesday": false,
-          "pancake_thursday": false,
-          "burger_friday": false
-        }
-      },
-      "thursday": {
-        "day_name": {
-          "swedish": "Torsdag",
-          "english": "Thursday"
-        },
-        "dishes": [
-          "Kycklingnuggets med ris & citronmajonnässås",
-          "Jambalaja med räkor, ris & aioli",
-          "Krämig linssoppa med kokosgrädde & fake bacon",
-          "Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
-        ],
-        "special_features": {
-          "sweet_tuesday": false,
-          "fruity_wednesday": false,
-          "pancake_thursday": true,
-          "burger_friday": false
-        }
-      },
-      "friday": {
-        "day_name": {
-          "swedish": "Fredag",
-          "english": "Friday"
-        },
-        "dishes": [
-          "Hamburgare med tillbehör serveras med ugnsrostad potatis",
-          "Fiskgratäng med champinjonsås & kokt potatis",
-          "Vegoburgare med  tillbehör serveras med ugnsrostad potatis"
-        ],
-        "special_features": {
-          "sweet_tuesday": false,
-          "fruity_wednesday": false,
-          "pancake_thursday": false,
-          "burger_friday": false
-        }
-      }
-    },
-    "footer": "Allergisk? Fråga oss!"
-  },
-  "menu_id": 521,
-  "last_retrieved_at": 1663955103.240052,
-  "status": "success",
-  "status_code": 200
+	"menu": {
+		"title": "Lunchmeny Eatery Kista Nod v.8",
+		"week_number": 8,
+		"days": {
+			"monday": {
+				"day_name": {
+					"swedish": "Måndag",
+					"english": "Monday"
+				},
+				"dishes": [
+					"Thaigryta med bambuskott och ris",
+					"Friterad spättafilé med tartarsås, dillslungad potatis och kålsallad med citronvinegrette",
+					"Enchiladas med kryddig sojafärs, bönor, het tomatsås, och ris"
+				],
+				"special_features": {
+					"sweet_tuesday": false,
+					"fruity_wednesday": false,
+					"pancake_thursday": false,
+					"burger_friday": false
+				}
+			},
+			"tuesday": {
+				"day_name": {
+					"swedish": "Tisdag",
+					"english": "Tuesday"
+				},
+				"dishes": [
+					"Husets spaghetti Carbonara med riven grana padano och svartpeppar",
+					"Krämig torsk från medelhavet med smörig rödvinssås, och kokt potatis samt picklad rödlök",
+					"Tortellini a la Panna med krämig parmesanost- & svartpepparsås"
+				],
+				"special_features": {
+					"sweet_tuesday": false,
+					"fruity_wednesday": false,
+					"pancake_thursday": false,
+					"burger_friday": false
+				}
+			},
+			"wednesday": {
+				"day_name": {
+					"swedish": "Onsdag",
+					"english": "Wednesday"
+				},
+				"dishes": [
+					"Köttbullar med gräddsås, kokt potatis , lingon och inlagd grurka",
+					"Wallenbergare på lax med rårörda lingon, sallad på gröna ärtor och fänkål och potatispuré",
+					"Falafel med spenatbulgur, spetskål, citron och sambalcremé"
+				],
+				"special_features": {
+					"sweet_tuesday": false,
+					"fruity_wednesday": false,
+					"pancake_thursday": false,
+					"burger_friday": false
+				}
+			},
+			"thursday": {
+				"day_name": {
+					"swedish": "Torsdag",
+					"english": "Thursday"
+				},
+				"dishes": [
+					"Kyckling gröncurry, kokos, limeblad, cashewnötter samt asiatiskt ris med cardemumma",
+					"Bakad nilabborre med citronvelouté, rödbetspanko och knaperstekt bacon",
+					"Majs och chilisoppa med rostade rotfrukter, örtolja, krispigt bröd",
+					"Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
+				],
+				"special_features": {
+					"sweet_tuesday": false,
+					"fruity_wednesday": false,
+					"pancake_thursday": true,
+					"burger_friday": false
+				}
+			},
+			"friday": {
+				"day_name": {
+					"swedish": "Fredag",
+					"english": "Friday"
+				},
+				"dishes": [
+					"Ugnsbakad Falukorv med chilibearnaise, Idahopotatis och brynta bönor",
+					"Fishtaco med mangosallad, citrusaioli, ris och tortillabröd",
+					"Risotto med bakad hokaidoopumpa, ruccola och lagrad ost"
+				],
+				"special_features": {
+					"sweet_tuesday": false,
+					"fruity_wednesday": false,
+					"pancake_thursday": false,
+					"burger_friday": false
+				}
+			}
+		},
+		"footer": "Allergi? Fråga oss!\n   Rädda maten!\nOm vi får över mat från lunchen säljer vi matlådor mellan kl. 13.30-14.30 för take away.\nEndast 64kr, bra för miljön och för din plånbok."
+	},
+	"menu_id": 2401,
+	"last_retrieved_at": 1677004673.557245,
+	"previous_revisions": [{
+		"revision_number": 1,
+		"change_discovered_at": 1676882703.20626,
+		"previous_data": {
+			"title": "Lunchmeny Eatery Kista Nod v.8",
+			"week_number": 8,
+			"days": {
+				"monday": {
+					"day_name": {
+						"swedish": "Måndag",
+						"english": "Monday"
+					},
+					"dishes": [
+						"Thaigryta med bambuskott och ris",
+						"Friterad spättafilé med tartarsås, dillslungad potatis och kålsallad med citronvinegrette",
+						"Enchiladas med kryddig sojafärs, bönor, het tomatsås, och ris"
+					],
+					"special_features": {
+						"sweet_tuesday": false,
+						"fruity_wednesday": false,
+						"pancake_thursday": false,
+						"burger_friday": false
+					}
+				},
+				"tuesday": {
+					"day_name": {
+						"swedish": "Tisdag",
+						"english": "Tuesday"
+					},
+					"dishes": [
+						"Husets spaghetti Carbonara med riven grana padano och svartpeppar",
+						"Krämig torsk från medelhavet med smörig rödvinssås, och kokt potatis samt picklad rödlök",
+						"Tortellini a la Panna med krämig parmesanost- & svartpepparsås"
+					],
+					"special_features": {
+						"sweet_tuesday": false,
+						"fruity_wednesday": false,
+						"pancake_thursday": false,
+						"burger_friday": false
+					}
+				},
+				"wednesday": {
+					"day_name": {
+						"swedish": "Onsdag",
+						"english": "Wednesday"
+					},
+					"dishes": [
+						" Köttbullar med gräddsås, kokt potatis , lingon och inlagd grurka",
+						"Wallenbergare på lax med rårörda lingon, sallad på gröna ärtor och fänkål och potatispuré",
+						"Falafel med spenatbulgur, spetskål, citron och sambalcremé"
+					],
+					"special_features": {
+						"sweet_tuesday": false,
+						"fruity_wednesday": false,
+						"pancake_thursday": false,
+						"burger_friday": false
+					}
+				},
+				"thursday": {
+					"day_name": {
+						"swedish": "Torsdag",
+						"english": "Thursday"
+					},
+					"dishes": [
+						" Kyckling gröncurry, kokos, limeblad, cashewnötter samt asiatiskt ris med cardemumma",
+						"Bakad nilabborre med citronvelouté, rödbetspanko och knaperstekt bacon",
+						"Majs och chilisoppa med rostade rotfrukter, örtolja, krispigt bröd",
+						"Pancake Thursday: Vi bjuder på pannkakor, lättvispad grädde och hemmagjord sylt!"
+					],
+					"special_features": {
+						"sweet_tuesday": false,
+						"fruity_wednesday": false,
+						"pancake_thursday": true,
+						"burger_friday": false
+					}
+				},
+				"friday": {
+					"day_name": {
+						"swedish": "Fredag",
+						"english": "Friday"
+					},
+					"dishes": [
+						"Ugnsbakad Falukorv med chilibearnaise, Idahopotatis och brynta bönor",
+						"Fishtaco med mangosallad, citrusaioli, ris och tortillabröd",
+						"Risotto med bakad hokaidoopumpa, ruccola och lagrad ost"
+					],
+					"special_features": {
+						"sweet_tuesday": false,
+						"fruity_wednesday": false,
+						"pancake_thursday": false,
+						"burger_friday": false
+					}
+				}
+			},
+			"footer": "Allergi? Fråga oss!"
+		}
+	}],
+	"status": "success",
+	"status_code": 200
 }</textarea>
     <p>Om den efterfrågade menyn inte finns på servern så kommer du att få ett 404 Not Found-svar som säger vad som är
         fel.</p>

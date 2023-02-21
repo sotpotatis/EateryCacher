@@ -3,7 +3,7 @@
 */
 const editors = [{
     id: "menu-response",
-    foldLines: [5,22,40,57,75],
+    foldLines: [5,22,39,56,74,99],
     customHeight: "25vh"
 }, {
     id: "menu-list-response",
@@ -30,6 +30,7 @@ for (const editorData of editors) {
     // Check if lines should be folded (and if so, fold them)
     if (editorData.foldLines !== undefined){
         for (const lineNumber of editorData.foldLines){
+            console.log(`Folding code ${lineNumber}`)
             editor.foldCode(lineNumber)
         }
     }
