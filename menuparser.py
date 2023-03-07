@@ -39,7 +39,7 @@ known_footer_phrases = [
     re.compile("(.*)allergier(.*)"),
 ]  # Known phrases that are in the bottom of the Eatery menu
 week_menu_title_regex = re.compile(
-    "(.*)([0-9]{1,2})(.*)"
+    "([\D]*)([0-9]{1,2})([\D]*)"
 )  # Regex for getting the week number from a title.
 # Logging
 logger = logging.getLogger(__name__)
