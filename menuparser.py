@@ -52,6 +52,13 @@ class MenuParser:
         """Initialization function. Does not require any arguments."""
         pass
 
+    def trim_whitespace(self, input_string):
+        """Trims various whitespace from an input string.
+
+        :param input_string: The input string to process."""
+        result = " ".join(input_string.split())
+        return result
+
     def parse(self, menu_content):
         """Function for parsing a menu. Takes the JSON value from Eatery's API (loaded as a dict),
         and converts it into a human-readable, JSON-serializable, dictionary.
@@ -59,7 +66,7 @@ class MenuParser:
         :param menu_content: The JSON value from Eatery's API (loaded as a dict)"""
         # Get the menu string
         menu_string = menu_content["content"]["content"]
-        menu_title = menu_content["content"]["title"]
+        menu_title = self.trim_whitespace(menu_content["content"]["title"])
         menu_url = (
             "https://eatery.se/" + menu_content["uri"].strip("/")
             if "uri" in menu_content
@@ -82,7 +89,9 @@ class MenuParser:
         if len(menu_footer) > 0:
             if type(menu_footer) == list:
                 logger.debug("Footer is list. Joining...")
-                menu_footer = "\n".join([item["text"] for item in menu_footer])
+                menu_footer = "\n".join(
+                    [self.trim_whitespace(item["text"]) for item in menu_footer]
+                )
             else:
                 logger.debug("Footer type is not list.")
         else:  # If no footer is present
@@ -140,11 +149,11 @@ class MenuParser:
                     f"Special features for {current_day}: {result[current_day]['special_features']}"
                 )  # Log found special features for the day
                 if len(row) > 1:
+                    row = self.trim_whitespace(row)  # Trim whitespace from row
                     if (
                         any(re.fullmatch(regex, row) for regex in known_footer_phrases)
                         is False
                     ):  # If no known footer phrases has been found
-                        row = row.strip()  # Trim whitespace from row
                         result[current_day]["dishes"].append(
                             row
                         )  # Add the row to the list of dished for the day
