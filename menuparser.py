@@ -75,7 +75,9 @@ class MenuParser:
         else:
             logger.warning(f"Week number not found for title {menu_title}!")
             menu_week = None
-        menu_footer = menu_content["content"]["footer"]
+        menu_footer = (
+            menu_content["content"]["footer"] if "footer" in menu_content else []
+        )
         # Parse footer
         if len(menu_footer) > 0:
             if type(menu_footer) == list:
@@ -147,7 +149,9 @@ class MenuParser:
                             row
                         )  # Add the row to the list of dished for the day
                     else:
-                        logger.debug(f"{row} is an expected phrase.")
+                        logger.debug(f"{row} is an expected/known footer phrase.")
+                        if menu_footer is None:  # Add footer if not added already
+                            menu_footer = ""
                         menu_footer += f"\n{row}"
             else:
                 logger.info("Nothing should be added to the previous row.")
