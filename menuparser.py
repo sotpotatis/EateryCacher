@@ -23,20 +23,28 @@ special_features = {
 }
 week_days_id_list = list(day_names_to_json_keys.values())
 known_footer_phrases = [
-    re.compile(
-        "(.*)Eaterykortet*(.*)"
-    ),  # Alternativt regex: (((L|l)unch){0,} *[0-9]{0,} *kr *)(med *){0,}Eaterykortet(.*) (mindre kompakt)
-    re.compile("(.*)ingår(.*)"),
-    re.compile("(.*)Rädda maten!(.*)"),
-    re.compile("(.*)Om vi får över mat från lunchen(.*)"),
-    re.compile(r"(.*)Endast \d+kr, bra för miljön och för din plånbok.(.*)"),
-    re.compile("(.*)Early Bird(.*)"),
-    re.compile("(.*)L = Laktos"),
-    re.compile("(.*)G = Gluten"),
-    re.compile("(.*)N = Nötter"),
-    re.compile("(.*)S = Skaldjur"),
-    re.compile("(.*)F = Fisk"),
-    re.compile("(.*)allergier(.*)"),
+    "(.*)Eaterykortet*(.*)"
+    # Alternativt regex: (((L|l)unch){0,} *[0-9]{0,} *kr *)(med *){0,}Eaterykortet(.*) (mindre kompakt)
+    "(.*)ingår(.*)",
+    "(.*)Rädda maten!(.*)",
+    "(.*)Om vi får över mat från lunchen(.*)",
+    r"(.*)Endast \d+kr, bra för miljön och för din plånbok.(.*)",
+    "(.*)Early Bird(.*)",
+    "(.*)L = Laktos",
+    "(.*)G = Gluten",
+    "(.*)N = Nötter",
+    "(.*)S = Skaldjur",
+    "(.*)F = Fisk",
+    "(.*)allergier(.*)",
+    "(.*)Ta mer(.*)",
+    "(.*)inte är nöjd(.*)",
+    "(.*)rabatt(.*)",
+    "(.*)välkommen(.*)",
+    "(.*)kl\.(.*)",
+    "(.*)Eatery-kortet(.*)",
+    "(.*)detta får du(.*)",
+    # Promotion for the buffet, freshly baked bread etc.
+    "(.*)((Salladsbuffé)|(nybakat bröd)|(bubbelvatten))(.*)",
 ]  # Known phrases that are in the bottom of the Eatery menu
 week_menu_title_regex = re.compile(
     "([\D]*)([0-9]{1,2})([\D]*)"
@@ -115,8 +123,11 @@ class MenuParser:
             logger.debug(f"Parsing row content {row}...")
             found_day = None
             for day, day_id in day_names_to_json_keys.items():
-                if day.lower() in row.lower():  # If a day was found
-                    logger.info(f"Found data for day {day}!")
+                # If a day was found.
+                # Also avoid catching Eatery promotion using plural day names:
+                # "måndagar", "tisdagar", etc...
+                if day.lower() in row.lower() and f"{day.lower()}ar" not in row.lower():
+                    logger.info(f'Found data for day {day} (matched by "{row}")!')
                     found_day = current_day = day_id
                     result[found_day] = {
                         "day_name": {"swedish": day, "english": day_id.capitalize()},
@@ -150,10 +161,19 @@ class MenuParser:
                 )  # Log found special features for the day
                 if len(row) > 1:
                     row = self.trim_whitespace(row)  # Trim whitespace from row
+                    footer_phrase_found = False
+                    for regex in known_footer_phrases:
+                        if re.fullmatch(regex, row, re.IGNORECASE):
+                            logger.info(
+                                f"Found footer phrase: {row}, matched by {regex}"
+                            )
+                            footer_phrase_found = True
                     if (
-                        any(re.fullmatch(regex, row) for regex in known_footer_phrases)
-                        is False
+                        not footer_phrase_found
                     ):  # If no known footer phrases has been found
+                        logger.info(
+                            f"Adding {row} to list of dishes for {current_day}..."
+                        )
                         result[current_day]["dishes"].append(
                             row
                         )  # Add the row to the list of dished for the day
