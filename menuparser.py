@@ -43,6 +43,7 @@ known_footer_phrases = [
     "(.*)kl\.(.*)",
     "(.*)Eatery-kortet(.*)",
     "(.*)detta får du(.*)",
+    "(.*)något sött till(.*)",
     # Promotion for the buffet, freshly baked bread etc.
     "(.*)((Salladsbuffé)|(nybakat bröd)|(bubbelvatten))(.*)",
 ]  # Known phrases that are in the bottom of the Eatery menu
